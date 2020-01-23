@@ -22,6 +22,7 @@ Descriptions des tables et données utilisées dans le projet
 | Nom de colonne | A | B | C |
 |----------------|---|---|---|
 |Description     | Contenu de la colonne A | Contenu de la colonne B | Contenu de la colonne C |
+|Type     | type A | type B | type C |
 ---------------------
 ## Fonctionnement des scripts
 Description des fonctionnements des scripts
