@@ -23,10 +23,10 @@ Il y a quatre batches:
 
 | Nom du batch | id film     | Usage    |
 | ------------ | ----------- | -------- |
-| DevSet Part1 | de 0 à 13   | Training |
-| DevSet Part2 | de 14 à 43  | Training |
-| DevSet Part3 | de 44 à 53  | Training |
-| DevSet Part1 | de 54 à 65  | Testing  |
+| ```DevSet-Part1``` | de 0 à 13   | Training |
+| ```DevSet-Part2``` | de 14 à 43  | Training |
+| ```DevSet-Part3``` | de 44 à 53  | Training |
+| ```TestSet```      | de 54 à 65  | Testing  |
 
 Il y a 5 types de données : 
 + Audio feature
@@ -40,10 +40,10 @@ Il y a 5 types de données :
 
 Consiste en des fichiers ```.csv```. Le path de chaque fichiers est :
 ```
-MEDIAEVAL18-DevSet-{BATCH_NAME}-Audio_features/audio_features/MEDIAEVAL18_{FILM_ID}/MEDIAEVAL18_{FILM_ID}_{PARTITION_ID}.csv
+MEDIAEVAL18-{BATCH_NAME}-Audio_features/audio_features/MEDIAEVAL18_{FILM_ID}/MEDIAEVAL18_{FILM_ID}_{PARTITION_ID}.csv
 ```
 Avec 
-+ ```BATCHNAME``` le nom de batch (```Part1```, ```Part2```, ```Part3``` ou ```TestSet```).
++ ```BATCHNAME``` le nom de batch (```DevSet-Part1```, ```DevSet-Part2```, ```DevSet-Part3``` ou ```TestSet```).
 + ```FILM_ID``` id du film, sur 2 caractères.
 + ```PARTITION_ID``` id du la partition audio, sur 5 caractères.
 
@@ -75,10 +75,10 @@ Les descripteurs sont les suivants :
 Chaque seconde, une frame est extraite du film. Pour cette frame extraite, tous les descripteurs sont évalués. Il y a un ficher ```.txt```par frame et par descripteur. Le path est : 
 
 ```
-MEDIAEVAL18-DevSet-{BATCH_NAME}-Visual_features/visual_features/MEDIAEVAL18_{FILM_ID}/{DESCRIPTOR}/MEDIAEVAL18_{FILM_ID}_{PARTITION_ID}_{DESCRIPTOR}.txt
+MEDIAEVAL18-{BATCH_NAME}-Visual_features/visual_features/MEDIAEVAL18_{FILM_ID}/{DESCRIPTOR}/MEDIAEVAL18_{FILM_ID}_{PARTITION_ID}_{DESCRIPTOR}.txt
 ```
 Avec 
-+ ```BATCHNAME``` : le nom de batch (```Part1```, ```Part2```, ```Part3``` ou ```TestSet```).
++ ```BATCHNAME``` : le nom de batch (```DevSet-Part1```, ```DevSet-Part2```, ```DevSet-Part3``` ou ```TestSet```).
 + ```FILM_ID``` : id du film, sur 2 caractères, de 0 à 65.
 + ```PARTITION_ID``` : id du la partition audio, sur 5 caractères.
 + ```DESCRIPTOR ``` : nom abrégé du descripteur (```acc```, ```cedd```, ```cl```, ```eh```, ```fcth```, ```gabor```, ```icd```, ```sc```, ```tamura```, ```lbp``` ou ```fc6```).
