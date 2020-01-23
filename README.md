@@ -20,8 +20,9 @@
 Lien de téléchargement des fichiers : + [LIRIS-ACCEDE](https://liris-accede.ec-lyon.fr/)
 
 Il y a quatre batches:
+
 | Nom du batch | id film     | Usage    |
-|--------------|-------------|----------|
+| ------------ | ----------- | -------- |
 | DevSet Part1 | de 0 à 13   | Training |
 | DevSet Part2 | de 14 à 43  | Training |
 | DevSet Part3 | de 44 à 53  | Training |
@@ -50,7 +51,7 @@ Il y a un fichier par seconde de film. Les descripteurs sont évaluées sur une 
 
 Exemple : le fichier ```MEDIAEVAL18_19_00123.csv``` donne les descripteurs audios du film 19, pour la séquence audio comprise entre 121.5 sec et 125.5 sec.
 
-Cas particulier des séquence de début et de fin : les descripteurs des indices ```00001``` et ```00002``` sont une copie des descripteurs de la séquence ```00003````.
+Cas particulier des séquence de début et de fin : les descripteurs des indices ```00001``` et ```00002``` sont une copie des descripteurs de la séquence ```00003```.
 
 A COMPLETER : CONTENU DES FICHIER ```.csv```
 
@@ -97,6 +98,7 @@ A COMPLETER
 
 A COMPLETER
 
+--------------------
 
 ## Fonctionnement des scripts
 Description des fonctionnements des scripts
