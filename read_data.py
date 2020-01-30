@@ -154,7 +154,7 @@ def valence_arousal(movie_id):
 
 def all_features(movie_id):
     T_v = all_visual_feature(movie_id)
-    T_a = all_audio_fature(movie_id)
+    T_a = all_audio_feature(movie_id)
     return torch.cat([T_v,T_a], dim = 1)
 
 if __name__ == '__main__':
