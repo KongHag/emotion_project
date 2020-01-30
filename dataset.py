@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import read_data
 import numpy as np
+from read_data import load_data
 
 #%%
 
@@ -37,6 +38,10 @@ class Dataset():
         
         
 if __name__=="__main__":
-    my_dataset = Dataset(3, 150, 3)
-    X, Y = my_dataset.get_random_training_batch()
-    print(X.shape, Y.shape)
+    import time
+    start = time.time()
+    data = load_data()
+    print(time.time() - start)
+    # my_dataset = Dataset(3, 150, 3)
+    # X, Y = my_dataset.get_random_training_batch()
+

@@ -1,13 +1,24 @@
 # coding:utf-8
 
-"""Extract all the visual feature
+"""Extract all the features
+
+To load the data :
+    // Having the file data/pickle.data
+    from read_data import load_data
+    data = load_data()
 
 Erreur trouvée dans les données:
-    MEDIAEVAL18_27-00006_cl.txt     : empty
-    Film 18 feature fc6 : données lacunaires
-    Film 18 feature jcd : données lacunaires
+    Movie 6 :
+        audio feature for frame 5588 is missing
 
-    Film 6 frame 5588 : pas de données
+    Movie 18 :
+        visual feature :
+            fc6 : missing data
+            jcd : missing data
+
+    Movie 27 :
+        visual feature :
+            cl : frame 00006 empty file
 """
 
 import torch
@@ -108,11 +119,8 @@ def audio_features_image_id_to_list(movie_id, image_id):
     return audio_features_values
 
 
-def all_audio_feature(movie_id):
-    """Returns a tensor of the feature values; first dim is the time
-
-    movie_id (int): the id of the movie
-    """
+def all_audio_features(movie_id):
+    """Returns a tensor of the feature values; first dim is the time"""
 
     image_id = 1
     list_data = []
@@ -144,11 +152,10 @@ def visual_feature(movie_id, feature):
             return torch.tensor(list_data)
 
 
-def all_visual_feature(movie_id):
-    """Get all descriptors for given movie"""
-    list_data = []
-    for f in visual_feature_names:
-        list_data.append(visual_feature(movie_id, f))
+def all_visual_features(movie_id):
+    """Get all features for given movie"""
+    list_data = [visual_feature(movie_id, feature_name)
+                 for f in visual_feature_names]
     return torch.cat(list_data, dim=1)
 
 
@@ -162,48 +169,57 @@ def valence_arousal(movie_id):
 
 
 def all_features(movie_id):
-    T_v = all_visual_feature(movie_id)
-    T_a = all_audio_feature(movie_id)
+    """Returns the concatenation of visual and audio features for a movie
+    
+    The numbers of frames are not egal for the visual and the audio feature.
+    The overnumerous frame are deleted.
+    """
+    T_v = all_visual_features(movie_id)
+    T_a = all_audio_features(movie_id)
     min_ = min(T_v.shape[0], T_a.shape[0])
-    T_v = T_v[:min_,:]
-    T_a = T_a[:min_,:]
-    return torch.cat([T_v,T_a], dim = 1)
-
+    T_v = T_v[:min_, :]
+    T_a = T_a[:min_, :]
+    return torch.cat([T_v, T_a], dim=1)
 
 
 def get_window(movie_id, seq_len, start):
     T = all_features(movie_id)
     VA_T = valence_arousal(movie_id)
     min_ = min(T.shape[0], VA_T.shape[0])
-    T = T[:min_,:]
-    VA_T = VA_T[:min_,:]
+    T = T[:min_, :]
+    VA_T = VA_T[:min_, :]
     starting_index = int(start*(T.shape[0]-seq_len+1))
-    return T[starting_index:starting_index + seq_len,:], VA_T[starting_index:starting_index + seq_len,:]
+    return T[starting_index:starting_index + seq_len, :], VA_T[starting_index:starting_index + seq_len, :]
+
 
 def dump_tensors():
-    pass
+    """ Create a pickle of all the data
+    [
+        (X_movie0, Y_movie_0),
+        (X_movie1, Y_movie_1),
+        ...
+    ]
+    """
+    XY_list = []
+    for movie_id in range(66):
+        if movie_id in [6, 18, 27, 46]:
+            continue
+        X = all_features(movie_id)
+
+        print("FEATURES\tmovie :", movie_id,
+              "\tTensor shape :", X.shape)
+
+        Y = valence_arousal(movie_id)
+        print("OUTPUT\tmovie :", movie_id,
+              "\tTensor shape :", Y.shape)
+
+        XY_list.append((X, Y))
+
+    pickle.dump(XY_list, open("test", "wb"))
+
+def load_data():
+    return pickle.load(open("data/data.pickle", "rb"))
 
 
 if __name__ == '__main__':
-    for movie_id in range(1, 4):
-        if movie_id in [6, 18]:
-            continue
-
-        my_tensor1 = valence_arousal(movie_id)
-
-        print("VALENCE/AROUSAL\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor1.shape)
-
-        my_tensor2 = all_visual_feature(movie_id,)
-        print("VISUAL FEATURE\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor2.shape)
-
-        my_tensor3 = all_audio_feature(movie_id)
-        print("AUDIO FEATURE\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor3.shape)
-
-        pickle.dump((my_tensor1, my_tensor2, my_tensor3), open("test"+str(movie_id),"wb"))
-
-
-        
-            
+    dump_tensors()
