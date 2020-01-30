@@ -52,7 +52,14 @@ Il y a un fichier par seconde de film. Les descripteurs sont évaluées sur une 
 
 Exemple : le fichier ```MEDIAEVAL18_19_00123.csv``` donne les descripteurs audios du film 19, pour la séquence audio comprise entre 121.5 sec et 125.5 sec.
 
-Cas particulier des séquence de début et de fin : les descripteurs des indices ```00001``` et ```00002``` sont une copie des descripteurs de la séquence ```00003```.
+Cas particulier des séquences de début et de fin : les descripteurs des indices ```00001``` et ```00002``` sont une copie des descripteurs de la séquence ```00003```.
+
+Pour chaque image, il y a 1 582 descripteurs :
++ 1 428 descripteurs type LLD (21 fonctions appliquées sur 68 contours LLD (low-level_descriptor))
++ 152 descripteurs type pitch-based LLD (19 fonctions appliquées sur les 8 pitch-based LLD)
++ 2 descripteurs : "the number of pitch onsets (pseudo syllables) and the total duration of the input are appended"
+
+
 
 A COMPLETER : CONTENU DES FICHIER ```.csv```
 

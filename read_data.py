@@ -9,8 +9,10 @@ Erreur trouvée dans les données:
 """
 
 import torch
+import arff
+import numpy as np
 
-features = ["acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
+visual_feature_names = ["acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
             "sc", "tamura", "lbp", "fc6"]
 
 def movie_id_to_set_name(movie_id):
@@ -60,6 +62,23 @@ def valence_arousal_make_path(movie_id):
 
     return path.format(set_name, str_movie_id)
 
+def audio_features_make_path(movie_id, image_id):
+    """Returns the path of the corresponding file for the audio features
+
+    movie_id (int) : from 0 to 65
+    image_id (int) : number of seconds from the begining of the movie
+    """
+
+    # Convert id into string
+    str_movie_id = "%02d" % movie_id  # 1 becomes "01"
+    str_image_id = "%05d" % image_id  # 13 becomes "00013"
+
+    set_name = movie_id_to_set_name(movie_id)
+    path = ("data/MEDIAEVAL18-{0}-Audio_features/audio_features"
+            + "/MEDIAEVAL18_{1}/MEDIAEVAL18_{1}_{2}.csv")
+
+    return path.format(set_name, str_movie_id, str_image_id)  
+
 
 def visual_features_image_id_to_list(movie_id, feature, image_id):
     """Returns a list of float regarding the movie, the feature and the image_id"""
@@ -68,6 +87,36 @@ def visual_features_image_id_to_list(movie_id, feature, image_id):
     with open(path, "r") as f:
         return [float(val) for val in f.readline().split(",")]
 
+def audio_features_image_id_to_list(movie_id, image_id):
+    """Returns the list of float regarding the movie, and the image_id"""
+
+    path = audio_features_make_path(movie_id, image_id)
+    _, iterator_val = arff.load(path)
+
+    audio_features_values = []
+    for i, val in enumerate(iterator_val):
+        if i == 0:
+            continue
+        audio_features_values.append(val)
+
+    return audio_features_values
+
+def all_audio_feature(movie_id):
+    """Returns a tensor of the feature values; first dim is the time
+
+    movie_id (int): the id of the movie
+    """
+
+    image_id = 1
+    list_data = []
+    while True:
+        try:
+            list_data.append(audio_features_image_id_to_list(
+                movie_id, image_id))
+            image_id += 1
+            #print(list_data)
+        except FileNotFoundError:
+            return torch.tensor(list_data)
 
 def visual_feature(movie_id, feature):
     """Returns a tensor of the feature values; first dim is the time
@@ -90,7 +139,7 @@ def visual_feature(movie_id, feature):
 def all_visual_feature(movie_id):
     """Get all descriptors for given movie"""
     list_data = []
-    for f in features:
+    for f in visual_feature_names:
         list_data.append(visual_feature(movie_id, f))
     return torch.cat(list_data, dim = 1)
 
@@ -105,16 +154,22 @@ def valence_arousal(movie_id):
 
 
 if __name__ == '__main__':
-    for movie_id in range(66):
-        for feature in features:
-            try:
-                my_tensor = visual_feature(movie_id, feature)
-                print("VISUAL FEATURE\tmovie :", movie_id, "\tFeature :", feature,
-                      "\tTensor shape :", my_tensor.shape)
-            except Exception as exc:
-                print("Film {}, feature {} : erreur de lecture".format(
-                    movie_id, feature))
+    # for movie_id in range(12, 13):
+    #     for feature in visual_feature_names:
+    #         try:
+    #             my_tensor = visual_feature(movie_id, feature)
+    #             print("VISUAL FEATURE\tmovie :", movie_id, "\tFeature :", feature,
+    #                   "\tTensor shape :", my_tensor.shape)
+    #         except Exception as exc:
+    #             print("Film {}, feature {} : erreur de lecture".format(
+    #                 movie_id, feature))
 
-        my_tensor = valence_arousal(movie_id)
-        print("VALENCE/AROUSAL\tmovie :", movie_id,
-              "\tTensor shape :", my_tensor.shape)
+    # #     my_tensor = valence_arousal(movie_id)
+    # #     print("VALENCE/AROUSAL\tmovie :", movie_id,
+    # #           "\tTensor shape :", my_tensor.shape)
+
+    # print(all_visual_feature(13).shape)
+    for movie_id in range(0, 20):
+        print(movie_id)
+        my_tensor = all_audio_feature(movie_id)
+        print(my_tensor.shape)
