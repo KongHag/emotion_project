@@ -13,7 +13,7 @@ import torch
 features = ["acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
             "sc", "tamura", "lbp", "fc6"]
 
-
+#str
 def movie_id_to_set_name(movie_id):
     """Returns the the set name of the movie"""
     if movie_id < 14:
