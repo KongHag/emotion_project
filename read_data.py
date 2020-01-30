@@ -166,6 +166,14 @@ def all_features(movie_id):
     return torch.cat([T_v, T_a], dim=1)
 
 
+
+def get_window(movie_id, seq_len, start):
+    T = all_features(movie_id)
+    VA_T = valence_arousal(movie_id)
+    starting_index = start*(T.shape[0]-seq_len+1)
+    return T[starting_index:starting_index + seq_len,:], VA_T[starting_index:starting_index + seq_len,:]
+
+
 if __name__ == '__main__':
     for movie_id in range(1, 4):
         if movie_id in [6, 18]:
