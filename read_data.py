@@ -87,6 +87,13 @@ def visual_feature(movie_id, feature):
             image_id += 1
         except FileNotFoundError:
             return torch.tensor(list_data)
+        
+def all_visual_feature(movie_id):
+    """Get all descriptors for given movie"""
+    list_data = []
+    for f in features:
+        list_data.append(visual_feature(movie_id, f))
+    return torch.cat(list_data, dim = 1)
 
 
 def valence_arousal(movie_id):
