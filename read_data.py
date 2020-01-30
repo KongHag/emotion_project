@@ -152,6 +152,10 @@ def valence_arousal(movie_id):
         table = [line.split("\t") for line in f.readlines()]
         return torch.tensor([[float(val) for val in row[1:]] for row in table[1:]])
 
+def all_features(movie_id):
+    T_v = all_visual_feature(movie_id)
+    T_a = all_audio_fature(movie_id)
+    return torch.cat([T_v,T_a], dim = 1)
 
 if __name__ == '__main__':
     # for movie_id in range(12, 13):

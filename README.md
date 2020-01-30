@@ -3,13 +3,15 @@
 ## Séance du 23/01/2020
 - [x] Finir de lire l'article
 - [x] Créer un github
-- [ ] Envoyer un mail à M. Dellandréa pour les soumissions à [MediaEval](http://www.multimediaeval.org/)
+- [x] Envoyer un mail à M. Dellandréa pour les soumissions à [MediaEval](http://www.multimediaeval.org/)
 - [X] Explorer la base de données
 ## Séance du 30/01/2020
-- [ ] Terminer les fonction de lecture des données
-- [ ] Lecture de doc torch sur les couches RNN
+- [x] Terminer les fonction de lecture des données
+- [x] Lecture de doc torch sur les couches RNN
 - [ ] Premier pipe
 - [ ] Premier entraînement
+## Séance 06/02/2020
+- [ ] argParser
 --------------------
 ## Liens utiles
 + [LIRIS-ACCEDE](https://liris-accede.ec-lyon.fr/)
