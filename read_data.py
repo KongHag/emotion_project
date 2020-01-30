@@ -155,12 +155,18 @@ def valence_arousal(movie_id):
 def all_features(movie_id):
     T_v = all_visual_feature(movie_id)
     T_a = all_audio_feature(movie_id)
+    min_ = min(T_v.shape[0], T_a.shape[0])
+    T_v = T_v[:min_,:]
+    T_a = T_a[:min_,:]
     return torch.cat([T_v,T_a], dim = 1)
 
 
 def get_window(movie_id, seq_len, start):
     T = all_features(movie_id)
     VA_T = valence_arousal(movie_id)
+    min_ = min(T.shape[0], VA_T.shape[0])
+    T = T[:min_,:]
+    VA_T = VA_T[:min_,:]
     starting_index = start*(T.shape[0]-seq_len+1)
     return T[starting_index:starting_index + seq_len,:], VA_T[starting_index:starting_index + seq_len,:]
 
