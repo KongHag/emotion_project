@@ -13,7 +13,7 @@ import torch
 features = ["acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
             "sc", "tamura", "lbp", "fc6"]
 
-
+#str
 def movie_id_to_set_name(movie_id):
     """Returns the the set name of the movie"""
     if movie_id < 14:
@@ -104,6 +104,8 @@ def valence_arousal(movie_id):
         table = [line.split("\t") for line in f.readlines()]
         return torch.tensor([[float(val) for val in row[1:]] for row in table[1:]])
 
+
+# Test
 
 if __name__ == '__main__':
     for movie_id in range(66):
