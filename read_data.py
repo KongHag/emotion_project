@@ -177,8 +177,11 @@ def get_window(movie_id, seq_len, start):
     min_ = min(T.shape[0], VA_T.shape[0])
     T = T[:min_,:]
     VA_T = VA_T[:min_,:]
-    starting_index = start*(T.shape[0]-seq_len+1)
+    starting_index = int(start*(T.shape[0]-seq_len+1))
     return T[starting_index:starting_index + seq_len,:], VA_T[starting_index:starting_index + seq_len,:]
+
+def dump_tensors():
+    pass
 
 
 if __name__ == '__main__':
