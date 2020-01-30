@@ -6,6 +6,8 @@ Erreur trouvée dans les données:
     MEDIAEVAL18_27-00006_cl.txt     : empty
     Film 18 feature fc6 : données lacunaires
     Film 18 feature jcd : données lacunaires
+
+    Film 6 frame 5588 : pas de données
 """
 
 import torch
@@ -13,7 +15,8 @@ import arff
 import numpy as np
 
 visual_feature_names = ["acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
-            "sc", "tamura", "lbp", "fc6"]
+                        "sc", "tamura", "lbp", "fc6"]
+
 
 def movie_id_to_set_name(movie_id):
     """Returns the the set name of the movie"""
@@ -62,6 +65,7 @@ def valence_arousal_make_path(movie_id):
 
     return path.format(set_name, str_movie_id)
 
+
 def audio_features_make_path(movie_id, image_id):
     """Returns the path of the corresponding file for the audio features
 
@@ -77,7 +81,7 @@ def audio_features_make_path(movie_id, image_id):
     path = ("data/MEDIAEVAL18-{0}-Audio_features/audio_features"
             + "/MEDIAEVAL18_{1}/MEDIAEVAL18_{1}_{2}.csv")
 
-    return path.format(set_name, str_movie_id, str_image_id)  
+    return path.format(set_name, str_movie_id, str_image_id)
 
 
 def visual_features_image_id_to_list(movie_id, feature, image_id):
@@ -86,6 +90,7 @@ def visual_features_image_id_to_list(movie_id, feature, image_id):
     path = visual_features_make_path(movie_id, feature, image_id)
     with open(path, "r") as f:
         return [float(val) for val in f.readline().split(",")]
+
 
 def audio_features_image_id_to_list(movie_id, image_id):
     """Returns the list of float regarding the movie, and the image_id"""
@@ -101,6 +106,7 @@ def audio_features_image_id_to_list(movie_id, image_id):
 
     return audio_features_values
 
+
 def all_audio_feature(movie_id):
     """Returns a tensor of the feature values; first dim is the time
 
@@ -114,9 +120,9 @@ def all_audio_feature(movie_id):
             list_data.append(audio_features_image_id_to_list(
                 movie_id, image_id))
             image_id += 1
-            #print(list_data)
         except FileNotFoundError:
             return torch.tensor(list_data)
+
 
 def visual_feature(movie_id, feature):
     """Returns a tensor of the feature values; first dim is the time
@@ -135,13 +141,14 @@ def visual_feature(movie_id, feature):
             image_id += 1
         except FileNotFoundError:
             return torch.tensor(list_data)
-        
+
+
 def all_visual_feature(movie_id):
     """Get all descriptors for given movie"""
     list_data = []
     for f in visual_feature_names:
         list_data.append(visual_feature(movie_id, f))
-    return torch.cat(list_data, dim = 1)
+    return torch.cat(list_data, dim=1)
 
 
 def valence_arousal(movie_id):
@@ -152,28 +159,28 @@ def valence_arousal(movie_id):
         table = [line.split("\t") for line in f.readlines()]
         return torch.tensor([[float(val) for val in row[1:]] for row in table[1:]])
 
+
 def all_features(movie_id):
     T_v = all_visual_feature(movie_id)
     T_a = all_audio_feature(movie_id)
-    return torch.cat([T_v,T_a], dim = 1)
+    return torch.cat([T_v, T_a], dim=1)
+
 
 if __name__ == '__main__':
-    # for movie_id in range(12, 13):
-    #     for feature in visual_feature_names:
-    #         try:
-    #             my_tensor = visual_feature(movie_id, feature)
-    #             print("VISUAL FEATURE\tmovie :", movie_id, "\tFeature :", feature,
-    #                   "\tTensor shape :", my_tensor.shape)
-    #         except Exception as exc:
-    #             print("Film {}, feature {} : erreur de lecture".format(
-    #                 movie_id, feature))
+    for movie_id in range(1, 4):
+        if movie_id in [6, 18]:
+            continue
 
-    # #     my_tensor = valence_arousal(movie_id)
-    # #     print("VALENCE/AROUSAL\tmovie :", movie_id,
-    # #           "\tTensor shape :", my_tensor.shape)
+        my_tensor = valence_arousal(movie_id)
+        print("VALENCE/AROUSAL\tmovie :", movie_id,
+            "\tTensor shape :", my_tensor.shape)
 
-    # print(all_visual_feature(13).shape)
-    for movie_id in range(0, 20):
-        print(movie_id)
+        my_tensor = all_visual_feature(movie_id,)
+        print("VISUAL FEATURE\tmovie :", movie_id,
+            "\tTensor shape :", my_tensor.shape)
+
         my_tensor = all_audio_feature(movie_id)
-        print(my_tensor.shape)
+        print("AUDIO FEATURE\tmovie :", movie_id,
+            "\tTensor shape :", my_tensor.shape)
+        
+            
