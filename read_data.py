@@ -13,6 +13,7 @@ Erreur trouvée dans les données:
 import torch
 import arff
 import numpy as np
+import pickle
 
 visual_feature_names = ["acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
                         "sc", "tamura", "lbp", "fc6"]
@@ -179,16 +180,21 @@ if __name__ == '__main__':
         if movie_id in [6, 18]:
             continue
 
-        my_tensor = valence_arousal(movie_id)
+        my_tensor1 = valence_arousal(movie_id)
+
         print("VALENCE/AROUSAL\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor.shape)
+            "\tTensor shape :", my_tensor1.shape)
 
-        my_tensor = all_visual_feature(movie_id,)
+        my_tensor2 = all_visual_feature(movie_id,)
         print("VISUAL FEATURE\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor.shape)
+            "\tTensor shape :", my_tensor2.shape)
 
-        my_tensor = all_audio_feature(movie_id)
+        my_tensor3 = all_audio_feature(movie_id)
         print("AUDIO FEATURE\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor.shape)
+            "\tTensor shape :", my_tensor3.shape)
+
+        pickle.dump((my_tensor1, my_tensor2, my_tensor3), open("test"+str(movie_id),"wb"))
+
+
         
             
