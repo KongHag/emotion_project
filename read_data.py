@@ -21,7 +21,6 @@ Erreur trouvée dans les données:
             cl : frame 00006 empty file
 """
 
-import torch
 import arff
 import numpy as np
 import pickle
@@ -130,7 +129,7 @@ def all_audio_features(movie_id):
                 movie_id, image_id))
             image_id += 1
         except FileNotFoundError:
-            return torch.tensor(list_data)
+            return np.array(list_data, dtype=np.float16)
 
 
 def visual_feature(movie_id, feature):
@@ -149,14 +148,14 @@ def visual_feature(movie_id, feature):
                 movie_id, feature, image_id))
             image_id += 1
         except FileNotFoundError:
-            return torch.tensor(list_data)
+            return np.array(list_data, dtype=np.float16)
 
 
 def all_visual_features(movie_id):
     """Get all features for given movie"""
-    list_data = [visual_feature(movie_id, feature_name)
-                 for f in visual_feature_names]
-    return torch.cat(list_data, dim=1)
+    list_data = [visual_feature(movie_id, visual_feature_name)
+                 for visual_feature_name in visual_feature_names]
+    return np.concatenate(list_data, axis=1)
 
 
 def valence_arousal(movie_id):
@@ -165,12 +164,12 @@ def valence_arousal(movie_id):
     path = valence_arousal_make_path(movie_id)
     with open(path, "r") as f:
         table = [line.split("\t") for line in f.readlines()]
-        return torch.tensor([[float(val) for val in row[1:]] for row in table[1:]])
+        return np.array([[float(val) for val in row[1:]] for row in table[1:]], dtype=np.float16)
 
 
 def all_features(movie_id):
     """Returns the concatenation of visual and audio features for a movie
-    
+
     The numbers of frames are not egal for the visual and the audio feature.
     The overnumerous frame are deleted.
     """
@@ -179,7 +178,7 @@ def all_features(movie_id):
     min_ = min(T_v.shape[0], T_a.shape[0])
     T_v = T_v[:min_, :]
     T_a = T_a[:min_, :]
-    return torch.cat([T_v, T_a], dim=1)
+    return np.concatenate((T_v, T_a), axis=1)
 
 
 def get_window(movie_id, seq_len, start):
@@ -192,7 +191,7 @@ def get_window(movie_id, seq_len, start):
     return T[starting_index:starting_index + seq_len, :], VA_T[starting_index:starting_index + seq_len, :]
 
 
-def dump_tensors():
+def dump_data():
     """ Create a pickle of all the data
     [
         (X_movie0, Y_movie_0),
@@ -200,26 +199,34 @@ def dump_tensors():
         ...
     ]
     """
-    XY_list = []
+    XX = []
+    YY = []
     for movie_id in range(66):
         if movie_id in [6, 18, 27, 46]:
             continue
         X = all_features(movie_id)
 
         print("FEATURES\tmovie :", movie_id,
-              "\tTensor shape :", X.shape)
+              "\tArray shape :", X.shape)
 
         Y = valence_arousal(movie_id)
         print("OUTPUT\tmovie :", movie_id,
-              "\tTensor shape :", Y.shape)
+              "\tArray shape :", Y.shape)
 
-        XY_list.append((X, Y))
+        XX.append(X)
+        YY.append(Y)
 
-    pickle.dump(XY_list, open("test", "wb"))
+    pickle.dump(XX, open("data/x_train.pickle", "wb"))
+    pickle.dump(YY, open("data/y_train.pickle", "wb"))
+
 
 def load_data():
-    return pickle.load(open("data/data.pickle", "rb"))
+    return(
+        pickle.load(open("data/x_train.pickle", "rb")),
+        pickle.load(open("data/y_train.pickle", "rb")))
 
 
 if __name__ == '__main__':
-    dump_tensors()
+    dump_data()
+    x_train, y_train = load_data()
+    print(len(x_train), len(y_train))
