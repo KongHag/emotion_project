@@ -24,6 +24,9 @@ def MSELoss(batch_predict, batch_label):
     loss = torch.nn.MSELoss()
     return loss(batch_predict_reshaped, batch_label_reshaped)
 
+def PearsonLoss(batch_predict, batch_label):
+    return 0
+
 
 def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_size, lr, optimizer, seq_len, criterion, grad_clip):
     model = RecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout)
