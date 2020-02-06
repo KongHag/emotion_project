@@ -73,7 +73,7 @@ class EmotionDataset(Dataset):
             start = np.random.random()
             X[i, :, :], Y[i, :, :] = self.get_window(movie_id, seq_len, start)
             # Model predicts one step ahead of the sequence
-        return torch.from_numpy(X), torch.from_numpy(Y)
+        return X, Y
 
     # built-in method are useless since we don't use a dataloader
     # def __len__(self):
