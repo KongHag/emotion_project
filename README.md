@@ -27,7 +27,7 @@ Télécharger le fichier data.pickle et le mettre dans le dossier ```data```.
 
 ```python
 from read_data import load_data
-data = load_data()
+x, y = load_data()
 ```
 
 ```data``` est un liste de tuple ```(X, Y)```. 
