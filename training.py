@@ -16,6 +16,14 @@ from model import RecurrentNet
 from dataset import EmotionDataset
 #%%
 
+def MSELoss(batch_predict, batch_label):
+    size = list(batch_predict.size())
+    batch_predict_reshaped = batch_predict.view(size[0]*size[1], size[2])
+    batch_label_reshaped = batch_label.view(size[0]*size[1], size[2])
+
+    loss = torch.nn.MSELoss()
+    return loss(batch_predict_reshaped, batch_label_reshaped)
+
 
 def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_size, lr, optimizer, seq_len):
     model = RecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout)
