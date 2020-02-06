@@ -30,6 +30,8 @@ def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_
     optimizer = torch.optim.Adam(model.parameters(),lr=lr)
     dataset = EmotionDataset()
     
+    device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+    
     losses = []
     
     if criterion == 'mse':
@@ -44,6 +46,7 @@ def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_
         model.zero_grad()
         
         X, Y = dataset.get_random_training_batch(batch_size, seq_len)
+        X, Y = torch.from_numpy(X, device = device), torch.from_numpy(Y, device = device)
         
         hidden = model.initHelper(batch_size)
         
