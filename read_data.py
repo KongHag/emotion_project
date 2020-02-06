@@ -21,7 +21,6 @@ Erreur trouvée dans les données:
             cl : frame 00006 empty file
 """
 
-import arff
 import numpy as np
 import pickle
 
@@ -227,6 +226,7 @@ def load_data():
 
 
 if __name__ == '__main__':
+    import arff
     dump_data()
     x_train, y_train = load_data()
     print(len(x_train), len(y_train))
