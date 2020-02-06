@@ -57,7 +57,7 @@ def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_
         
         L = loss(y,Y)
         
-        losses.apend(L)
+        losses.append(L)
         
         #Backward step
         L.backward()
