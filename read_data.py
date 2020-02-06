@@ -1,16 +1,26 @@
 # coding:utf-8
 
-"""Extract all the visual feature
+"""Extract all the features
+
+To load the data :
+    // Having the file data/pickle.data
+    from read_data import load_data
+    data = load_data()
 
 Erreur trouvée dans les données:
-    MEDIAEVAL18_27-00006_cl.txt     : empty
-    Film 18 feature fc6 : données lacunaires
-    Film 18 feature jcd : données lacunaires
+    Movie 6 :
+        audio feature for frame 5588 is missing
 
-    Film 6 frame 5588 : pas de données
+    Movie 18 :
+        visual feature :
+            fc6 : missing data
+            jcd : missing data
+
+    Movie 27 :
+        visual feature :
+            cl : frame 00006 empty file
 """
 
-import torch
 import arff
 import numpy as np
 import pickle
@@ -108,11 +118,8 @@ def audio_features_image_id_to_list(movie_id, image_id):
     return audio_features_values
 
 
-def all_audio_feature(movie_id):
-    """Returns a tensor of the feature values; first dim is the time
-
-    movie_id (int): the id of the movie
-    """
+def all_audio_features(movie_id):
+    """Returns a tensor of the feature values; first dim is the time"""
 
     image_id = 1
     list_data = []
@@ -122,7 +129,7 @@ def all_audio_feature(movie_id):
                 movie_id, image_id))
             image_id += 1
         except FileNotFoundError:
-            return torch.tensor(list_data)
+            return np.array(list_data, dtype=np.float16)
 
 
 def visual_feature(movie_id, feature):
@@ -141,15 +148,14 @@ def visual_feature(movie_id, feature):
                 movie_id, feature, image_id))
             image_id += 1
         except FileNotFoundError:
-            return torch.tensor(list_data)
+            return np.array(list_data, dtype=np.float16)
 
 
-def all_visual_feature(movie_id):
-    """Get all descriptors for given movie"""
-    list_data = []
-    for f in visual_feature_names:
-        list_data.append(visual_feature(movie_id, f))
-    return torch.cat(list_data, dim=1)
+def all_visual_features(movie_id):
+    """Get all features for given movie"""
+    list_data = [visual_feature(movie_id, visual_feature_name)
+                 for visual_feature_name in visual_feature_names]
+    return np.concatenate(list_data, axis=1)
 
 
 def valence_arousal(movie_id):
@@ -158,52 +164,69 @@ def valence_arousal(movie_id):
     path = valence_arousal_make_path(movie_id)
     with open(path, "r") as f:
         table = [line.split("\t") for line in f.readlines()]
-        return torch.tensor([[float(val) for val in row[1:]] for row in table[1:]])
+        return np.array([[float(val) for val in row[1:]] for row in table[1:]], dtype=np.float16)
 
 
 def all_features(movie_id):
-    T_v = all_visual_feature(movie_id)
-    T_a = all_audio_feature(movie_id)
-    min_ = min(T_v.shape[0], T_a.shape[0])
-    T_v = T_v[:min_,:]
-    T_a = T_a[:min_,:]
-    return torch.cat([T_v,T_a], dim = 1)
+    """Returns the concatenation of visual and audio features for a movie
 
+    The numbers of frames are not egal for the visual and the audio feature.
+    The overnumerous frame are deleted.
+    """
+    T_v = all_visual_features(movie_id)
+    T_a = all_audio_features(movie_id)
+    min_ = min(T_v.shape[0], T_a.shape[0])
+    T_v = T_v[:min_, :]
+    T_a = T_a[:min_, :]
+    return np.concatenate((T_v, T_a), axis=1)
 
 
 def get_window(movie_id, seq_len, start):
     T = all_features(movie_id)
     VA_T = valence_arousal(movie_id)
     min_ = min(T.shape[0], VA_T.shape[0])
-    T = T[:min_,:]
-    VA_T = VA_T[:min_,:]
+    T = T[:min_, :]
+    VA_T = VA_T[:min_, :]
     starting_index = int(start*(T.shape[0]-seq_len+1))
-    return T[starting_index:starting_index + seq_len,:], VA_T[starting_index:starting_index + seq_len,:]
+    return T[starting_index:starting_index + seq_len, :], VA_T[starting_index:starting_index + seq_len, :]
 
-def dump_tensors():
-    pass
+
+def dump_data():
+    """ Create a pickle of all the data
+    [
+        (X_movie0, Y_movie_0),
+        (X_movie1, Y_movie_1),
+        ...
+    ]
+    """
+    XX = []
+    YY = []
+    for movie_id in range(66):
+        if movie_id in [6, 18, 27, 46]:
+            continue
+        X = all_features(movie_id)
+
+        print("FEATURES\tmovie :", movie_id,
+              "\tArray shape :", X.shape)
+
+        Y = valence_arousal(movie_id)
+        print("OUTPUT\tmovie :", movie_id,
+              "\tArray shape :", Y.shape)
+
+        XX.append(X)
+        YY.append(Y)
+
+    pickle.dump(XX, open("data/x_train.pickle", "wb"))
+    pickle.dump(YY, open("data/y_train.pickle", "wb"))
+
+
+def load_data():
+    return(
+        pickle.load(open("data/x_train.pickle", "rb")),
+        pickle.load(open("data/y_train.pickle", "rb")))
 
 
 if __name__ == '__main__':
-    for movie_id in range(1, 4):
-        if movie_id in [6, 18]:
-            continue
-
-        my_tensor1 = valence_arousal(movie_id)
-
-        print("VALENCE/AROUSAL\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor1.shape)
-
-        my_tensor2 = all_visual_feature(movie_id,)
-        print("VISUAL FEATURE\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor2.shape)
-
-        my_tensor3 = all_audio_feature(movie_id)
-        print("AUDIO FEATURE\tmovie :", movie_id,
-            "\tTensor shape :", my_tensor3.shape)
-
-        pickle.dump((my_tensor1, my_tensor2, my_tensor3), open("test"+str(movie_id),"wb"))
-
-
-        
-            
+    dump_data()
+    x_train, y_train = load_data()
+    print(len(x_train), len(y_train))

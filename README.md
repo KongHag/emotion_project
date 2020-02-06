@@ -20,6 +20,24 @@
 + [Thèse Yohan Baveye](https://tel.archives-ouvertes.fr/tel-01272240/document)
 --------------------
 ## Données
+
+### Pour charger le dataset
+
+Télécharger le fichier data.pickle et le mettre dans le dossier ```data```.
+
+```python
+from read_data import load_data
+data = load_data()
+```
+
+```data``` est un liste de tuple ```(X, Y)```. 
++ ```X``` correspond un tenseur (temps, concaténation de tous les features)
++ ```Y``` correspond un tenseur (temps, valence/arousal)
+
+Les tenseurs X et Y n'ont pour l'instant pas exactement la même taille dans la dimension du temps.
+
+
+### Description du dataset
 Lien de téléchargement des fichiers : [LIRIS-ACCEDE](https://liris-accede.ec-lyon.fr/)
 
 Il y a quatre sets:
@@ -38,8 +56,16 @@ Il y a 5 types de donnée :
 + Fear annotations
 + Data
 
+#### Audio features
 
-### Audio features
+Pour récupérer les audio features d'un film, il faut faire :
+
+```python
+import read_data
+
+# Get the audio feature  the 12th movie
+audio_feature = read_data.audio_feature(12)
+```
 
 Consiste en des fichiers ```.csv```. Le path de chaque fichiers est :
 ```
@@ -62,18 +88,14 @@ Pour chaque image, il y a 1 582 descripteurs :
 + 2 descripteurs : "the number of pitch onsets (pseudo syllables) and the total duration of the input are appended"
 
 
+#### Visual features
 
-A COMPLETER : CONTENU DES FICHIER ```.csv```
-
-
-### Visual features
-
-Pour récupérer une feature d'un film, il suffit d'écrire :
+Pour récupérer une visual feature d'un film, il suffit d'écrire :
 
 ```python
 import read_data
 
-# Get the feature "eh" of the 12th
+# Get the audio feature of the 12th movie
 eh_feature = read_data.visual_feature(12, "eh")
 ```
 
@@ -115,17 +137,25 @@ import read_data
 valence_arousal = read_data.valence_arousal(12)
 ```
 
+Pour chaque seconde, une valeur de valence et d'arousal sont stockées dans un fichier ```.txt```.
+Le path est : 
 
-A COMPLETER
+```
+MEDIAEVAL18-{SET_NAME}-Valence-Arousal/annotation/MEDIAEVAL18_{MOVIE_ID}_Valence-Arousal.txt
+```
+Avec 
++ ```SET_NAME``` : le nom du set (```DevSet-Part1```, ```DevSet-Part2```, ```DevSet-Part3``` ou ```TestSet```).
++ ```MOVIE_ID``` : id du film, sur 2 caractères, de 0 à 65.
 
+Le fichier contient une liste de valeurs décimales séparées par une ```,``` . Les colonnes sont dans l'ordre le temps, la valence et l'arousal
 
 ### Fear annotation
 
-A COMPLETER
+Pas encore utilisé
 
 ### Data
 
-A COMPLETER
+Pas encore utilisé
 
 --------------------
 
