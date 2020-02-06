@@ -74,6 +74,7 @@ def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_
             
         if batch%20 == 0:
             torch.save(model, 'models/RecurrentNet.pt')
+    #TODO Add Loss plotting
     torch.save(model, 'models/RecurrentNet.pt')
 
         
