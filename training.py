@@ -17,17 +17,51 @@ from dataset import EmotionDataset
 #%%
 
 
-def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_size, lr, optimizer, seq_len):
+def trainRecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout, n_batch, batch_size, lr, optimizer, seq_len, criterion, grad_clip):
     model = RecurrentNet(in_dim, hid_dim, num_hid,out_dim, dropout)
     optimizer = torch.optim.Adam(model.parameters(),lr=lr)
-    dataset = EmotionDataset(seq_len)
+    dataset = EmotionDataset()
     
-    for b in range(n_batch):
-        
-        
+    losses = []
+    
+    if criterion == 'mse':
+        loss = MSELoss
+    elif criterion == 'pearson':
+        loss = PearsonLoss
+    
+    for batch in range(n_batch):
         #Train mode / optimizer reset
         model.train()
         optimizer.zero_grad()
         model.zero_grad()
+        
+        X, Y = dataset.get_random_training_batch(batch_size, seq_len)
+        
+        hidden = model.initHelper(batch_size)
+        
+        y = model(X, hidden)
+        
+        L = loss(y,Y)
+        
+        losses.apend(L)
+        
+        #Backward step
+        L.backward()
+            
+        #Gradient clip
+        torch.nn.utils.clip_grad_norm_(model.parameters(),grad_clip)
+            
+        #Optimizer step
+        optimizer.step()
+        
+        if batch%10 == 0:
+            print(f'Batch : {batch}')
+            print(f"\n Loss : {L : 3f}")
+            
+        if batch%20 == 0:
+            torch.save(model, 'models/RecurrentNet.pt')
+    torch.save(model, 'models/RecurrentNet.pt')
+
+        
         
         
