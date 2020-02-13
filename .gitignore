@@ -1,6 +1,9 @@
 # our data
 data/
 
+#Our models
+models*
+
 # 
 .DS_Store
 

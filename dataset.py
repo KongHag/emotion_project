@@ -7,14 +7,16 @@ Created on Thu Jan 30 09:42:18 2020
 Usage :
 >>> trainset = EmotionDataset()
 >>> X, Y = trainset.get_random_training_batch(batch_size=5, seq_len=10)
-
+>>> print("X \ttype :", type(X), "\tshape :", X.shape)
+X       type : <class 'numpy.ndarray'>  shape : (5, 10, 6950)
+>>> print("Y \ttype :", type(Y), "\tshape :", Y.shape)
+Y       type : <class 'numpy.ndarray'>  shape : (5, 10, 2)
 """
 
 import torch
 import torch.nn as nn
 import numpy as np
 from read_data import load_data
-
 from torch.utils.data import Dataset, DataLoader
 
 # %%
@@ -36,13 +38,11 @@ class EmotionDataset(Dataset):
         # ]
         # NB : Movies don't have the same nb of seconds
 
-
         # Number of features
         self.input_size = self.list_movies_features[0].shape[1]
 
         # self.dim_output = 2 (=len([valence, arousal]))
         self.output_size = self.list_movies_VA[0].shape[1]
-
 
     def get_window(self, movie_id, seq_len, start):
         """From a movie_id, returns a sequence of seq_len seconds, starting
@@ -75,19 +75,12 @@ class EmotionDataset(Dataset):
             # Model predicts one step ahead of the sequence
         return X, Y
 
-    # built-in method are useless since we don't use a dataloader
-    # def __len__(self):
-    #     return len(self.x)
-
-    # def __getitem__(self, idx):
-    #     return torch.tensor(self.x[idx]), torch.tensor(self.y[idx])
-
-
-
 
 if __name__ == "__main__":
     trainset = EmotionDataset()
     import time
     start = time.time()
-    X, Y = trainset.get_random_training_batch(batch_size=50, seq_len=100)
+    X, Y = trainset.get_random_training_batch(batch_size=5, seq_len=10)
+    print("X \ttype :", type(X), "\tshape :", X.shape)
+    print("Y \ttype :", type(Y), "\tshape :", Y.shape)
     print("Batch building duration :\t%.2f" % (time.time() - start))
