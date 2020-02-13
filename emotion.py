@@ -18,11 +18,13 @@ parser.add_argument("-O", "--optimizer", default="Adam", choices=["Adam", "RMSpr
 parser.add_argument("-C", "--crit", default="MSE", choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
 parser.add_argument("-B", "--bidirect", default=False, type=bool, help="Whether to use bidirectional")
 parser.add_argument("-R", "--regularisation", choices=["L1", "L2"], help="Type of regularization")
-parser.add_argument("-D", "--dropout", default=False, type=bool, help="Whether to use dropout")
+parser.add_argument("-D", "--dropout", default=0, type=float, help="Dropout probability between [0, 1]")
 
 if __name__ == '__main__':
     # TODO: plog argparser to LSTM NN
-    parser.parse_args()
+    args = parser.parse_args()
+    # access arguments with getattr(args, 'argument')
+    print(args)
 
     # exit
     sys.exit(0)
