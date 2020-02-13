@@ -199,5 +199,5 @@ optional arguments:
   -R {L1,L2}, --regularisation {L1,L2}
                         Type of regularization
   -D DROPOUT, --dropout DROPOUT
-                        Whether to use dropout
+                        Dropout probability between [0, 1]
    ```
