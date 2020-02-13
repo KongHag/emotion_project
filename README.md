@@ -8,7 +8,7 @@
 ## Séance du 30/01/2020
 - [x] Terminer les fonction de lecture des données
 - [x] Lecture de doc torch sur les couches RNN
-- [ ] Premier pipe
+- [x] Premier pipe
 - [ ] Premier entraînement
 ## Séance 06/02/2020
 - [x] argParser
