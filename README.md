@@ -8,7 +8,7 @@
 ## Séance du 30/01/2020
 - [x] Terminer les fonction de lecture des données
 - [x] Lecture de doc torch sur les couches RNN
-- [ ] Premier pipe
+- [x] Premier pipe
 - [ ] Premier entraînement
 ## Séance 06/02/2020
 - [x] argParser
@@ -199,5 +199,5 @@ optional arguments:
   -R {L1,L2}, --regularisation {L1,L2}
                         Type of regularization
   -D DROPOUT, --dropout DROPOUT
-                        Whether to use dropout
+                        Dropout probability between [0, 1]
    ```
