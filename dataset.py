@@ -3,6 +3,11 @@
 Created on Thu Jan 30 09:42:18 2020
 
 @author: Tim
+
+Usage :
+>>> trainset = EmotionDataset()
+>>> X, Y = trainset.get_random_training_batch(batch_size=5, seq_len=10)
+
 """
 
 import torch
@@ -21,7 +26,7 @@ class EmotionDataset(Dataset):
     (time, features)
     """
 
-    def __init__(self, seq_len):
+    def __init__(self):
         super(EmotionDataset, self).__init__()
         self.list_movies_features, self.list_movies_VA = load_data()
         # self.x = [
@@ -31,18 +36,15 @@ class EmotionDataset(Dataset):
         # ]
         # NB : Movies don't have the same nb of seconds
 
-        self.seq_len = seq_len
 
-        # TODO : Convert self.list_movies_features and self.list_movies_VA
-        # into a nb.ndarray of sequences (no need to be shuffled), exctracted
-        # from all movies (use self.get_window()). The duration of every
-        # sequence must be self.seq_len. Store the results in self.x and self.y
+        # Number of features
+        self.input_size = self.list_movies_features[0].shape[1]
 
-        self.x = np.empty(1)
-        self.y = np.empty(1)
+        # self.dim_output = 2 (=len([valence, arousal]))
+        self.output_size = self.list_movies_VA[0].shape[1]
 
 
-    def get_window(self, movie_id, start, seq_len):
+    def get_window(self, movie_id, seq_len, start):
         """From a movie_id, returns a sequence of seq_len seconds, starting
         from start (percent) of the all movie"""
         movie_features = self.list_movies_features[movie_id]
@@ -57,37 +59,35 @@ class EmotionDataset(Dataset):
         return (movie_features[starting_index:starting_index+seq_len, :],
                 movie_VA[starting_index:starting_index+seq_len, :])
 
-    # def get_random_training_batch(self):
-    #     X = np.zeros((self.batch_size, self.seq_len,
-    #                   self.input_size), dtype=np.float32)
-    #     Y = np.zeros((self.batch_size, self.seq_len,
-    #                   self.VA), dtype=np.float32)
+    def get_random_training_batch(self, batch_size, seq_len):
+        X = np.zeros((batch_size, seq_len,
+                      self.input_size), dtype=np.float32)
+        Y = np.zeros((batch_size, seq_len,
+                      self.output_size), dtype=np.float32)
 
-    #     choice = np.random.randint(0, self.n_films, self.batch_size)
-    #     for i, index in enumerate(choice):
+        random_movie_ids = np.random.randint(
+            0, len(self.list_movies_features), batch_size)
 
-    #         # Choose random starting point to exploit whole sequences
-    #         start = np.random.random()
-    #         X[i, :, :], Y[i, :, :] = read_data.get_window(
-    #             index, self.seq_len, start)
-    #         # Model predicts one step ahead of the sequence
+        for i, movie_id in enumerate(random_movie_ids):
+            # Choose random starting point to exploit whole sequences
+            start = np.random.random()
+            X[i, :, :], Y[i, :, :] = self.get_window(movie_id, seq_len, start)
+            # Model predicts one step ahead of the sequence
+        return X, Y
 
-    #     return X, Y
+    # built-in method are useless since we don't use a dataloader
+    # def __len__(self):
+    #     return len(self.x)
+
+    # def __getitem__(self, idx):
+    #     return torch.tensor(self.x[idx]), torch.tensor(self.y[idx])
 
 
-    def __len__(self):
-        return len(self.x)
 
-    def __getitem__(self, idx):
-        return torch.tensor(self.x[idx]), torch.tensor(self.y[idx])
-
-
-trainset = EmotionDataset(seq_len=200)
-trainloader = DataLoader(trainset, batch_size=10, shuffle=True, num_workers=4)
 
 if __name__ == "__main__":
+    trainset = EmotionDataset()
     import time
     start = time.time()
-    list_movies_features, list_movies_VA = load_data()
-    print("Loading duration :\t\t%.2f" % (time.time() - start))
-    print("Number of films loaded :\t", len(list_movies_features))
+    X, Y = trainset.get_random_training_batch(batch_size=50, seq_len=100)
+    print("Batch building duration :\t%.2f" % (time.time() - start))

@@ -1,13 +1,13 @@
 # coding:utf-8
 
-"""Extract all the features
+"""Extract all the features and valence/arousal
 
 To load the data :
-    // Having the file data/pickle.data
+    // Having the file data/x_train.pickle and data/y_train.pickle
     from read_data import load_data
-    data = load_data()
+    x_train, y_train = load_data()
 
-Erreur trouvée dans les données:
+Erreurs trouvées dans les données:
     Movie 6 :
         audio feature for frame 5588 is missing
 
@@ -19,9 +19,11 @@ Erreur trouvée dans les données:
     Movie 27 :
         visual feature :
             cl : frame 00006 empty file
+    
+    Movie 46 :
+        valence/arousal 100 values, but the film has around 3000 frames
 """
 
-import arff
 import numpy as np
 import pickle
 
@@ -227,6 +229,7 @@ def load_data():
 
 
 if __name__ == '__main__':
+    import arff
     dump_data()
     x_train, y_train = load_data()
     print(len(x_train), len(y_train))
