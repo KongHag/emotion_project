@@ -18,7 +18,9 @@ import torch.nn as nn
 import numpy as np
 from read_data import load_data
 from torch.utils.data import Dataset, DataLoader
+from log import setup_custom_logger
 
+logger = setup_custom_logger("dataset")
 # %%
 
 

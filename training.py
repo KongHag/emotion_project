@@ -35,6 +35,11 @@ def PearsonLoss(batch_predict, batch_label):
 
 def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
                       seq_len, grad_clip, device):
+    if criterion == "MSE":
+        criterion = MSELoss
+    elif criterion == "Pearson":
+        criterion = PearsonLoss
+
     losses = []
     for idx_batch in range(n_batch):
         # Train mode / optimizer reset
@@ -68,7 +73,7 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
 
         # Optimizer step
         optimizer.step()
-        pickle.dump(losses, open(("data/losses.pickle", "wb")))
+        pickle.dump(losses, open("data/losses.pickle", "wb"))
         if idx_batch % 10 == 0:
             logger.info(f'Batch : {idx_batch}')
             logger.info(f" Loss : {loss : 3f}")
