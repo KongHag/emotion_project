@@ -49,7 +49,10 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
             device=device), torch.from_numpy(Y).to(device=device)
 
         # Init hidden layer input
-        hidden = model.initHelper(batch_size)
+        hidden, cell = model.initHelper(batch_size)
+        hidden.to(device=device)
+        cell.to(device=device)
+        hidden = (hidden, cell)
 
         # Output and loss computation
         y = model(X, hidden)
@@ -76,18 +79,19 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
     torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
 
 if __name__=='__main__':
-    device = torch.device(
-        'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
-
-    dataset = EmotionDataset()
-
-    model = RecurrentNet(in_dim=6950, hid_dim=100, num_hid=2, out_dim=2,
-                        dropout=0.5)
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-
-    criterion = MSELoss
-
-    trainRecurrentNet(model=model, dataset=dataset, optimizer=optimizer,
-                    criterion=criterion, n_batch=100, batch_size=30, seq_len=100,
-                    grad_clip=10, device=device)
+#    device = torch.device(
+#        'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+#
+#    dataset = EmotionDataset()
+#
+#    model = RecurrentNet(in_dim=6950, hid_dim=100, num_hid=2, out_dim=2,
+#                        dropout=0.5)
+#
+#    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+#
+#    criterion = MSELoss
+#
+#    trainRecurrentNet(model=model, dataset=dataset, optimizer=optimizer,
+#                    criterion=criterion, n_batch=100, batch_size=30, seq_len=100,
+#                    grad_clip=10, device=device)
+    logger.info("test")
