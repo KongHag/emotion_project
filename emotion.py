@@ -2,6 +2,10 @@
 
 import sys
 import argparse
+import torch
+from dataset import EmotionDataset
+from model import RecurrentNet
+from training import MSELoss, trainRecurrentNet
 
 parser = argparse.ArgumentParser(description='Train Neural Network for emotion predictions')
 
@@ -21,10 +25,29 @@ parser.add_argument("-R", "--regularisation", choices=["L1", "L2"], help="Type o
 parser.add_argument("-D", "--dropout", default=0, type=float, help="Dropout probability between [0, 1]")
 
 if __name__ == '__main__':
-    # TODO: plog argparser to LSTM NN
     args = parser.parse_args()
     # access arguments with getattr(args, 'argument')
-    print(args)
+    device = torch.device(
+        'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
+    dataset = EmotionDataset()
+
+    model = RecurrentNet(in_dim=getattr(args, 'input-size'),
+                         hid_dim=getattr(args, 'hidden-dim'),
+                         num_hid=getattr(args, 'num-hidden'),
+                         out_dim=2,
+                         dropout=getattr(args, 'dropout'))
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=getattr(args, 'lr'))
+
+    criterion = MSELoss
+
+    trainRecurrentNet(model=model, dataset=dataset, optimizer=optimizer,
+                      criterion=getattr(args, 'crit'),
+                      n_batch=100,
+                      batch_size=getattr(args, 'batch_size'),
+                      seq_len=getattr(args, 'seq-len'),
+                      grad_clip=getattr(args, 'grad-clip'),
+                      device=device)
     # exit
     sys.exit(0)
