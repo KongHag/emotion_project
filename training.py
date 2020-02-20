@@ -8,13 +8,14 @@ Created on Thu Feb  6 11:01:37 2020
 from dataset import EmotionDataset
 from model import RecurrentNet
 import torch
-
+from log import setup_custom_logger
 # import numpy as np
 # from tqdm import tqdm
 # import torch.nn as nn
 # import sys
 # sys.path.insert(0, '.')
 # sys.path.insert(0, '..')
+logger = setup_custom_logger('Model training')
 # %%
 
 
@@ -65,8 +66,8 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
         optimizer.step()
 
         if idx_batch % 10 == 0:
-            print(f'Batch : {idx_batch}')
-            print(f" Loss : {loss : 3f}")
+            logger.info(f'Batch : {idx_batch}')
+            logger.info(f" Loss : {loss : 3f}")
 
         if idx_batch % 20 == 0:
             torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
