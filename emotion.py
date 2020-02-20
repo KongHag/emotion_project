@@ -6,6 +6,9 @@ import torch
 from dataset import EmotionDataset
 from model import RecurrentNet
 from training import MSELoss, trainRecurrentNet
+from log import setup_custom_logger
+
+logger = setup_custom_logger("emotion")
 
 parser = argparse.ArgumentParser(description='Train Neural Network for emotion predictions')
 
@@ -26,15 +29,17 @@ parser.add_argument("-D", "--dropout", default=0, type=float, help="Dropout prob
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    # access arguments with getattr(args, 'argument')
+    for arg in vars(args):
+        logger.info("initialization -- {} - {}".format(arg, getattr(args, arg)))
+
     device = torch.device(
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
     dataset = EmotionDataset()
 
-    model = RecurrentNet(in_dim=getattr(args, 'input-size'),
-                         hid_dim=getattr(args, 'hidden-dim'),
-                         num_hid=getattr(args, 'num-hidden'),
+    model = RecurrentNet(in_dim=getattr(args, 'input_size'),
+                         hid_dim=getattr(args, 'hidden_dim'),
+                         num_hid=getattr(args, 'num_hidden'),
                          out_dim=2,
                          dropout=getattr(args, 'dropout'))
 
@@ -46,8 +51,8 @@ if __name__ == '__main__':
                       criterion=getattr(args, 'crit'),
                       n_batch=100,
                       batch_size=getattr(args, 'batch_size'),
-                      seq_len=getattr(args, 'seq-len'),
-                      grad_clip=getattr(args, 'grad-clip'),
+                      seq_len=getattr(args, 'seq_len'),
+                      grad_clip=getattr(args, 'grad_clip'),
                       device=device)
     # exit
     sys.exit(0)
