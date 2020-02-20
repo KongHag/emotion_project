@@ -232,7 +232,7 @@ def load_data():
 
 
 if __name__ == '__main__':
-    import arff
-    dump_data()
+#    import arff
+#    dump_data()
     x_train, y_train = load_data()
-    logger.info(len(x_train), len(y_train))
+    print(len(x_train), len(y_train))
