@@ -29,26 +29,33 @@ parser.add_argument("-D", "--dropout", default=0, type=float, help="Dropout prob
 
 if __name__ == '__main__':
     try:
+        # Parse args
         args = parser.parse_args()
         for arg in vars(args):
             logger.info("initialization -- {} - {}".format(arg, getattr(args, arg)))
 
+        # Select device
         device = torch.device(
             'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
-
         logger.info("device - {}".format(str(device)))
 
+        # Init dataset
         dataset = EmotionDataset()
+        logger.debug("dataset initialized")
 
+        # Model initilisation
         model = RecurrentNet(in_dim=getattr(args, 'input_size'),
                             hid_dim=getattr(args, 'hidden_dim'),
                             num_hid=getattr(args, 'num_hidden'),
                             out_dim=2,
                             dropout=getattr(args, 'dropout'))
+        logger.info("model : {}".format(model))
 
         optimizer = torch.optim.Adam(model.parameters(), lr=getattr(args, 'lr'))
-
+        logger.debug("optimizer : {}".format(optimizer))
+        
         criterion = MSELoss
+        logger.debug("optimizer : {}".format(optimizer))
 
         trainRecurrentNet(model=model, dataset=dataset, optimizer=optimizer,
                         criterion=getattr(args, 'crit'),
@@ -57,6 +64,7 @@ if __name__ == '__main__':
                         seq_len=getattr(args, 'seq_len'),
                         grad_clip=getattr(args, 'grad_clip'),
                         device=device)
+                        
     except Exception as exception:
         logger.critical(sys.exc_info())
         

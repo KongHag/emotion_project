@@ -10,12 +10,7 @@ from model import RecurrentNet
 import torch
 from log import setup_custom_logger
 import pickle
-# import numpy as np
-# from tqdm import tqdm
-# import torch.nn as nn
-# import sys
-# sys.path.insert(0, '.')
-# sys.path.insert(0, '..')
+
 logger = setup_custom_logger('Model training')
 # %%
 
@@ -35,6 +30,8 @@ def PearsonLoss(batch_predict, batch_label):
 
 def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
                       seq_len, grad_clip, device):
+
+    logger.info("start training")
     if criterion == "MSE":
         criterion = MSELoss
     elif criterion == "Pearson":
@@ -43,10 +40,10 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
     losses = []
     for idx_batch in range(n_batch):
         logger.debug("Starting training with batch {}".format(idx_batch))
-       
+
         # Train mode / optimizer reset
         model.train()
-        logger.debug("model trained".format(idx_batch))
+        logger.debug("model trained")
         optimizer.zero_grad()
         model.zero_grad()
         logger.debug("gradients cleared")
@@ -56,14 +53,14 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
         logger.debug("batch generated")
 
         # Copy to GPU
-        gpu_X = torch.from_numpy(X).to(device=device)
-        gpu_Y = torch.from_numpy(Y).to(device=device)
-        logger.debug("X, Y copied on GPU")
+        gpu_X = torch.from_numpy(X).to(device=device).contiguous()
+        gpu_Y = torch.from_numpy(Y).to(device=device).contiguous()
+        logger.debug("X, Y copied on device {}".format(device))
 
         # Init hidden layer input
         hidden, cell = model.initHelper(batch_size)
-        gpu_hidden = hidden.to(device=device)
-        gpu_cell = cell.to(device=device)
+        gpu_hidden = hidden.to(device=device).contiguous()
+        gpu_cell = cell.to(device=device).contiguous()
         logger.debug("hidden layer and cell initialized")
 
         # Output and loss computation
@@ -85,8 +82,8 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
         optimizer.step()
         logger.debug("optimizer steped")
 
-        
         pickle.dump(losses, open("data/losses.pickle", "wb"))
+
         if idx_batch % 10 == 0:
             logger.info(f'Batch : {idx_batch}')
             logger.info(f"Loss : {loss : 3f}")
@@ -96,21 +93,22 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
 
     # TODO Add Loss plotting
     torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
-    
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     device = torch.device(
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
     dataset = EmotionDataset()
 
     model = RecurrentNet(in_dim=6950, hid_dim=100, num_hid=2, out_dim=2,
-                        dropout=0.5)
+                         dropout=0.5)
+    logger.info("neural network : {}".format(net))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
     criterion = MSELoss
 
     trainRecurrentNet(model=model, dataset=dataset, optimizer=optimizer,
-                    criterion=criterion, n_batch=100, batch_size=30, seq_len=100,
-                    grad_clip=10, device=device)
+                      criterion=criterion, n_batch=100, batch_size=30, seq_len=100,
+                      grad_clip=10, device=device)

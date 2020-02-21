@@ -10,12 +10,13 @@ import time
 import os
 
 
+# handler = logging.StreamHandler()
+# handler.setFormatter(formatter)
+# logger.addHandler(handler)
+
 def setup_custom_logger(name):
     formatter = logging.Formatter(
         fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
-
-    handler = logging.StreamHandler()
-
 
     if not os.path.exists('logs'):
         os.makedirs('logs')
@@ -24,14 +25,10 @@ def setup_custom_logger(name):
 
     fh = logging.FileHandler(log_file_name, mode="w")
     fh.setLevel(logging.DEBUG)
-
-    handler.setFormatter(formatter)
     fh.setFormatter(formatter)
-
     logger = logging.getLogger()
 
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(handler)
     logger.addHandler(fh)
 
     return logger
