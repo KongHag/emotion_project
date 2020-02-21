@@ -10,6 +10,7 @@ from model import RecurrentNet
 import torch
 from log import setup_custom_logger
 import pickle
+import os
 
 logger = setup_custom_logger('Model training')
 # %%
@@ -26,6 +27,7 @@ def MSELoss(batch_predict, batch_label):
 
 def PearsonLoss(batch_predict, batch_label):
     return 0
+
 
 def store(model):
     if not os.path.exists('models'):
@@ -58,14 +60,14 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
         logger.debug("batch generated")
 
         # Copy to GPU
-        gpu_X = torch.from_numpy(X).to(device=device)#.contiguous()
-        gpu_Y = torch.from_numpy(Y).to(device=device)#.contiguous()
+        gpu_X = torch.from_numpy(X).to(device=device)
+        gpu_Y = torch.from_numpy(Y).to(device=device)
         logger.debug("X, Y copied on device {}".format(device))
 
         # Init hidden layer input
         hidden, cell = model.initHelper(batch_size)
-        gpu_hidden = hidden.to(device=device)#.contiguous()
-        gpu_cell = cell.to(device=device)#.contiguous()
+        gpu_hidden = hidden.to(device=device)
+        gpu_cell = cell.to(device=device)
         logger.debug("hidden layer and cell initialized")
 
         # Output and loss computation
@@ -95,7 +97,6 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
 
         if idx_batch % 20 == 0:
             store(model)
-            
 
     # TODO Add Loss plotting
     torch.save(model.state_dict(), f='./models/RecurrentNet.pt')

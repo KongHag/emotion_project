@@ -7,6 +7,7 @@ from dataset import EmotionDataset
 from model import RecurrentNet
 from training import MSELoss, trainRecurrentNet
 from log import setup_custom_logger
+import logging
 
 logger = setup_custom_logger("emotion")
 
@@ -39,6 +40,8 @@ parser.add_argument("-R", "--regularisation",
                     choices=["L1", "L2"], help="Type of regularization (L1 or L2)")
 parser.add_argument("-D", "--dropout", default=0, type=float,
                     help="Dropout probability between [0, 1]")
+parser.add_argument("--logger-level", default=20, type=int,
+                    help="logger level from 10 (debug) to 50 (critical)")
 
 if __name__ == '__main__':
     try:
@@ -47,6 +50,9 @@ if __name__ == '__main__':
         for arg in vars(args):
             logger.info(
                 "initialization -- {} - {}".format(arg, getattr(args, arg)))
+
+        logger = logging.getLogger()
+        logger.setLevel(getattr(args, 'logger_level'))
 
         # Select device
         device = torch.device(
