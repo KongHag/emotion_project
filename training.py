@@ -27,6 +27,11 @@ def MSELoss(batch_predict, batch_label):
 def PearsonLoss(batch_predict, batch_label):
     return 0
 
+def store(model):
+    if not os.path.exists('models'):
+        os.makedirs('models')
+    torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
+
 
 def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
                       seq_len, grad_clip, device):
@@ -53,14 +58,14 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
         logger.debug("batch generated")
 
         # Copy to GPU
-        gpu_X = torch.from_numpy(X).to(device=device).contiguous()
-        gpu_Y = torch.from_numpy(Y).to(device=device).contiguous()
+        gpu_X = torch.from_numpy(X).to(device=device)#.contiguous()
+        gpu_Y = torch.from_numpy(Y).to(device=device)#.contiguous()
         logger.debug("X, Y copied on device {}".format(device))
 
         # Init hidden layer input
         hidden, cell = model.initHelper(batch_size)
-        gpu_hidden = hidden.to(device=device).contiguous()
-        gpu_cell = cell.to(device=device).contiguous()
+        gpu_hidden = hidden.to(device=device)#.contiguous()
+        gpu_cell = cell.to(device=device)#.contiguous()
         logger.debug("hidden layer and cell initialized")
 
         # Output and loss computation
@@ -89,7 +94,8 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
             logger.info(f"Loss : {loss : 3f}")
 
         if idx_batch % 20 == 0:
-            torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
+            store(model)
+            
 
     # TODO Add Loss plotting
     torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
