@@ -42,41 +42,54 @@ def trainRecurrentNet(model, dataset, optimizer, criterion, n_batch, batch_size,
 
     losses = []
     for idx_batch in range(n_batch):
+        logger.debug("Starting training with batch {}".format(idx_batch))
+       
         # Train mode / optimizer reset
         model.train()
+        logger.debug("model trained".format(idx_batch))
         optimizer.zero_grad()
         model.zero_grad()
+        logger.debug("gradients cleared")
 
         # Load numpy arrays
         X, Y = dataset.get_random_training_batch(batch_size, seq_len)
+        logger.debug("batch generated")
 
         # Copy to GPU
-        X, Y = torch.from_numpy(X).to(
-            device=device), torch.from_numpy(Y).to(device=device)
+        gpu_X = torch.from_numpy(X).to(device=device)
+        gpu_Y = torch.from_numpy(Y).to(device=device)
+        logger.debug("X, Y copied on GPU")
 
         # Init hidden layer input
         hidden, cell = model.initHelper(batch_size)
-        hidden.to(device=device)
-        cell.to(device=device)
-        hidden = (hidden, cell)
+        gpu_hidden = hidden.to(device=device)
+        gpu_cell = cell.to(device=device)
+        logger.debug("hidden layer and cell initialized")
 
         # Output and loss computation
-        y = model(X, hidden)
-        loss = criterion(y, Y)
+        gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
+        logger.debug("output computed")
+        loss = criterion(gpu_output, gpu_Y)
         losses.append(loss)
+        logger.debug("loss computed : {}".format(loss))
 
         # Backward step
         loss.backward()
+        logger.debug("loss backwarded")
 
         # Gradient clip
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+        logger.debug("grad clipped")
 
         # Optimizer step
         optimizer.step()
+        logger.debug("optimizer steped")
+
+        
         pickle.dump(losses, open("data/losses.pickle", "wb"))
         if idx_batch % 10 == 0:
             logger.info(f'Batch : {idx_batch}')
-            logger.info(f" Loss : {loss : 3f}")
+            logger.info(f"Loss : {loss : 3f}")
 
         if idx_batch % 20 == 0:
             torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
