@@ -232,7 +232,8 @@ def load_data():
 
 
 if __name__ == '__main__':
-#    import arff
-#    dump_data()
-    x_train, y_train = load_data()
-    print(len(x_train), len(y_train))
+    X, Y = load_data()
+    for i, (x, y) in enumerate(zip(X, Y)):
+        print(i, len(x), len(y))
+    #x_train, y_train = load_data()
+    #print(len(x_train), len(y_train))
