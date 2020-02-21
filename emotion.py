@@ -28,7 +28,7 @@ parser.add_argument("--batch-size", default=32,
 parser.add_argument("--grad-clip", default=10, type=float,
                     help="Boundaries of the gradient clipping function (centered on 0)")
 #parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
-parser.add_argument("--nb_batch", default=100,
+parser.add_argument("--nb-batch", default=100,
                     type=int, help="Number of batches")
 parser.add_argument("-O", "--optimizer", default="Adam",
                     choices=["Adam", "RMSprop"], help="Type of optimizer")
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         trainRecurrentNet(model=model, dataset=dataset, optimizer=optimizer,
                           criterion=getattr(args, 'crit'),
-                          n_batch=100,
+                          n_batch=getattr(args, 'nb_batch'),
                           batch_size=getattr(args, 'batch_size'),
                           seq_len=getattr(args, 'seq_len'),
                           grad_clip=getattr(args, 'grad_clip'),
