@@ -3,7 +3,7 @@
 import sys
 import argparse
 import torch
-from dataset import EmotionDataset
+from dataset import MediaEval18
 from model import RecurrentNet
 from training import MSELoss, trainRecurrentNet
 from log import setup_custom_logger
@@ -27,7 +27,7 @@ parser.add_argument("--batch-size", default=32,
                     type=int, help="Size of a batch")
 parser.add_argument("--grad-clip", default=10, type=float,
                     help="Boundaries of the gradient clipping function (centered on 0)")
-#parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
+# parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
 parser.add_argument("--nb-batch", default=100,
                     type=int, help="Number of batches")
 parser.add_argument("-O", "--optimizer", default="Adam",
@@ -43,53 +43,66 @@ parser.add_argument("-D", "--dropout", default=0, type=float,
 parser.add_argument("--logger-level", default=20, type=int,
                     help="logger level from 10 (debug) to 50 (critical)")
 
+
+def run(args):
+    # Select device
+    device = torch.device(
+        'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+    logger.info("device - {}".format(str(device)))
+
+    # Init dataset
+    trainset = MediaEval18(
+        root='./data', train=True, seq_len=getattr(args, 'seq_len'))
+    trainloader = torch.utils.data.DataLoader(
+        trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
+        num_workers=10)
+    testset = MediaEval18(
+        root='./data', train=False, seq_len=getattr(args, 'seq_len'), nb_sequences=200, shuffle=True)
+    testloader = torch.utils.data.DataLoader(
+        testset, batch_size=getattr(args, 'batch_size'), shuffle=True,
+        num_workers=10)
+    logger.debug("dataset/dataloader initialized")
+
+    # Model initilisation
+    model = RecurrentNet(in_dim=getattr(args, 'input_size'),
+                         hid_dim=getattr(args, 'hidden_dim'),
+                         num_hid=getattr(args, 'num_hidden'),
+                         out_dim=2,
+                         dropout=getattr(args, 'dropout'))
+    model.to(device)
+    logger.info("model : {}".format(model))
+
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=getattr(args, 'lr'))
+    logger.debug("optimizer : {}".format(optimizer))
+
+    criterion = MSELoss
+    logger.debug("criterion : {}".format(criterion))
+
+    trainRecurrentNet(model=model,
+                      trainloader=trainloader, testloader=testloader,
+                      optimizer=optimizer,
+                      criterion=getattr(args, 'crit'),
+                      n_batch=getattr(args, 'nb_batch'),
+                      seq_len=getattr(args, 'seq_len'),
+                      grad_clip=getattr(args, 'grad_clip'),
+                      device=device)
+
+
 if __name__ == '__main__':
+    # Parse args
+    args = parser.parse_args()
+    for arg in vars(args):
+        logger.info(
+            "initialization -- {} - {}".format(arg, getattr(args, arg)))
+
+    logger = logging.getLogger()
+    logger.setLevel(getattr(args, 'logger_level'))
+
     try:
-        # Parse args
-        args = parser.parse_args()
-        for arg in vars(args):
-            logger.info(
-                "initialization -- {} - {}".format(arg, getattr(args, arg)))
-
-        logger = logging.getLogger()
-        logger.setLevel(getattr(args, 'logger_level'))
-
-        # Select device
-        device = torch.device(
-            'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
-        logger.info("device - {}".format(str(device)))
-
-        # Init dataset
-        dataset = EmotionDataset()
-        logger.debug("dataset initialized")
-
-        # Model initilisation
-        model = RecurrentNet(in_dim=getattr(args, 'input_size'),
-                             hid_dim=getattr(args, 'hidden_dim'),
-                             num_hid=getattr(args, 'num_hidden'),
-                             out_dim=2,
-                             dropout=getattr(args, 'dropout'))
-        model.to(device)
-        logger.info("model : {}".format(model))
-
-        optimizer = torch.optim.Adam(
-            model.parameters(), lr=getattr(args, 'lr'))
-        logger.debug("optimizer : {}".format(optimizer))
-
-        criterion = MSELoss
-        logger.debug("optimizer : {}".format(optimizer))
-
-        trainRecurrentNet(model=model, dataset=dataset, optimizer=optimizer,
-                          criterion=getattr(args, 'crit'),
-                          n_batch=getattr(args, 'nb_batch'),
-                          batch_size=getattr(args, 'batch_size'),
-                          seq_len=getattr(args, 'seq_len'),
-                          grad_clip=getattr(args, 'grad_clip'),
-                          device=device)
-
+        run(args)
     except Exception as exception:
         logger.critical(sys.exc_info())
-
     finally:
         # exit
         sys.exit(0)

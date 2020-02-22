@@ -78,11 +78,76 @@ class EmotionDataset(Dataset):
         return X, Y
 
 
+class MediaEval18(Dataset):
+    def __init__(self, root='./data', train=True, seq_len=100, shuffle=False, nb_sequences=None):
+        self.root = root
+        self.train = train
+        self.seq_len = seq_len
+        self.shuffle = shuffle
+        self.nb_sequences = nb_sequences
+        self._data_to_sequences_list()
+
+    def _data_to_sequences_list(self):
+        if self.train:
+            self.data = load_data()[0][:50], load_data()[1][:50]
+        else:
+            self.data = load_data()[0][50:62], load_data()[1][50:62]
+
+        self._possible_starts = list(self._compute_possible_starts())
+        if self.shuffle:
+            np.random.shuffle(self._possible_starts)
+
+        if self.nb_sequences is not None:
+            self._possible_starts = self._possible_starts[:self.nb_sequences]
+
+    def _compute_possible_starts(self):
+        for movie_id, (movie_features, movie_VA) in enumerate(zip(*self.data)):
+            duration = min(movie_features.shape[0], movie_VA.shape[0])
+            start_idx = 0
+            while start_idx + self.seq_len < duration:
+                yield {"id_movie": movie_id, "start_idx": start_idx}
+                start_idx += 1
+
+    def get_window(self, movie_id, seq_len, start_idx):
+        """From a movie_id, returns a sequence of seq_len seconds, starting
+        from start (percent) of the all movie"""
+        list_movies_features, list_movies_VA = self.data
+        movie_features = list_movies_features[movie_id]
+        movie_VA = list_movies_VA[movie_id]
+
+        # Tronque (par la fin) la liste la plus longue
+        shorter_duration = min(movie_features.shape[0], movie_VA.shape[0])
+        movie_features = movie_features[:shorter_duration, :]
+        movie_VA = movie_VA[:shorter_duration, :]
+
+        return (movie_features[start_idx:start_idx+seq_len, :],
+                movie_VA[start_idx:start_idx+seq_len, :])
+
+    def __len__(self):
+        return len(self._possible_starts)
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+        start = self._possible_starts[idx]
+        return self.get_window(movie_id=start["id_movie"],
+                               seq_len=self.seq_len,
+                               start_idx=start["start_idx"])
+
+
 if __name__ == "__main__":
-    trainset = EmotionDataset()
+    # trainset = EmotionDataset()
     import time
-    start = time.time()
-    X, Y = trainset.get_random_training_batch(batch_size=5, seq_len=10)
-    print("X \ttype :", type(X), "\tshape :", X.shape)
-    print("Y \ttype :", type(Y), "\tshape :", Y.shape)
-    print("Batch building duration :\t%.2f" % (time.time() - start))
+    # start = time.time()
+    # X, Y = trainset.get_random_training_batch(batch_size=5, seq_len=10)
+    # print("X \ttype :", type(X), "\tshape :", X.shape)
+    # print("Y \ttype :", type(Y), "\tshape :", Y.shape)
+    # print("Batch building duration :\t%.2f" % (time.time() - start))
+
+    trainset = MediaEval18(root='./data', train=True, seq_len=100, nb_sequences=99)
+    trainloader = torch.utils.data.DataLoader(
+        trainset, batch_size=10, shuffle=True)
+
+    for i, data in enumerate(trainloader):
+        print(i, data[0].shape)
+
