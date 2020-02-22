@@ -130,9 +130,10 @@ class MediaEval18(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         start = self._possible_starts[idx]
-        return self.get_window(movie_id=start["id_movie"],
+        seq = self.get_window(movie_id=start["id_movie"],
                                seq_len=self.seq_len,
                                start_idx=start["start_idx"])
+        return seq[0].astype("float32"), seq[1].astype("float32")
 
 
 if __name__ == "__main__":
