@@ -37,10 +37,14 @@ def store(model):
     torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
 
 
-def compute_test_loss(model, testloader, criterion, device):
+def compute_test_loss(model, testloader, optimizer, criterion, device):
     losses = []
     for idx_batch, (X, Y) in enumerate(testloader):
         logger.debug("Starting testing with batch {}".format(idx_batch))
+
+        model.train()
+        optimizer.zero_grad()
+        model.zero_grad()
 
         # Copy to GPU
         gpu_X = X.to(device=device, dtype=torch.float32)
@@ -57,15 +61,13 @@ def compute_test_loss(model, testloader, criterion, device):
         gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
         logger.debug("output computed")
         loss = criterion(gpu_output, gpu_Y)
-        losses.append(loss)
+        losses.append(float(loss))
         logger.debug("loss computed : {}".format(loss))
-
-    
-    return np.mean([float(loss) for loss in losses])
+    return np.mean(losses)
 
 
-def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion, n_batch,
-                      seq_len, grad_clip, device):
+def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
+                      nb_epoch, grad_clip, device):
     logger.info("start training")
     if criterion == "MSE":
         criterion = MSELoss
@@ -73,60 +75,58 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion, n_ba
         criterion = PearsonLoss
 
     train_losses, test_losses = [], []
-    for idx_batch, (X, Y) in enumerate(trainloader):
-        if idx_batch > n_batch:
-            break
+    for epoch in range(nb_epoch):
+        logger.info("Starting training epoch {}".format(epoch))
+        for idx_batch, (X, Y) in enumerate(trainloader):
+            logger.debug("Starting training with batch {}".format(idx_batch))
 
-        logger.debug("Starting training with batch {}".format(idx_batch))
+            # Train mode / optimizer reset
+            model.train()
+            logger.debug("model in train mode")
+            optimizer.zero_grad()
+            model.zero_grad()
+            logger.debug("gradients cleared")
 
-        # Train mode / optimizer reset
-        model.train()
-        logger.debug("model in train mode")
-        optimizer.zero_grad()
-        model.zero_grad()
-        logger.debug("gradients cleared")
+            # Copy to GPU
+            gpu_X = X.to(device=device, dtype=torch.float32)
+            gpu_Y = Y.to(device=device, dtype=torch.float32)
+            logger.debug("X, Y copied on device {}".format(device))
 
-        # Copy to GPU
-        gpu_X = X.to(device=device, dtype=torch.float32)
-        gpu_Y = Y.to(device=device, dtype=torch.float32)
-        logger.debug("X, Y copied on device {}".format(device))
+            # Init hidden layer input
+            hidden, cell = model.initHelper(gpu_X.shape[0])
+            gpu_hidden = hidden.to(device=device)
+            gpu_cell = cell.to(device=device)
+            logger.debug("hidden layer and cell initialized")
 
-        # Init hidden layer input
-        hidden, cell = model.initHelper(gpu_X.shape[0])
-        gpu_hidden = hidden.to(device=device)
-        gpu_cell = cell.to(device=device)
-        logger.debug("hidden layer and cell initialized")
+            # Output and loss computation
+            gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
+            logger.debug("output computed")
+            loss = criterion(gpu_output, gpu_Y)
+            logger.debug("loss computed : {}".format(loss))
 
-        # Output and loss computation
-        gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
-        logger.debug("output computed")
-        loss = criterion(gpu_output, gpu_Y)
+            # Backward step
+            loss.backward()
+            logger.debug("loss backwarded")
+
+            # Gradient clip
+            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+            logger.debug("grad clipped")
+
+            # Optimizer step
+            optimizer.step()
+            logger.debug("optimizer steped")
+
+        logger.info(f'Epoch : {epoch}')
         train_losses.append((idx_batch, float(loss)))
-        logger.debug("loss computed : {}".format(loss))
+        test_loss = compute_test_loss(
+                model, testloader, optimizer, criterion, device)
+        test_losses.append((idx_batch, test_loss))
+        logger.info(f"Test loss : {test_loss : 3f}")
+        logger.info(f"Train loss : {loss : 3f}")
 
-        # Backward step
-        loss.backward()
-        logger.debug("loss backwarded")
-
-        # Gradient clip
-        torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-        logger.debug("grad clipped")
-
-        # Optimizer step
-        optimizer.step()
-        logger.debug("optimizer steped")
-
-        pickle.dump(train_losses, open("data/train_losses.pickle", "wb"))
-
-        if idx_batch % 10 == 0:
-            logger.info(f'Batch : {idx_batch}')
-            logger.info(f"Train loss : {loss : 3f}")
-            test_loss = compute_test_loss(model, testloader, criterion, device)
-            test_losses.append((idx_batch, test_loss))
-            logger.info(f"Test loss : {test_loss : 3f}")
+        if epoch % 20 == 0:
+            pickle.dump(train_losses, open("data/train_losses.pickle", "wb"))
             pickle.dump(test_losses, open("data/test_losses.pickle", "wb"))
-
-        if idx_batch % 20 == 0:
             store(model)
 
     # TODO Add Loss plotting
@@ -136,17 +136,18 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion, n_ba
 if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     device = torch.device(
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
-    trainset = MediaEval18(root='./data', train=True, seq_len=100)
+    trainset = MediaEval18(root='./data', train=True, seq_len=100, nb_sequences=100, shuffle=True)
     trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=100, shuffle=True)
-    testset = MediaEval18(root='./data', train=False, seq_len=100)
+        trainset, batch_size=4, shuffle=True)
+    testset = MediaEval18(root='./data', train=False, seq_len=100,
+                          nb_sequences=8, shuffle=True)
     testloader = torch.utils.data.DataLoader(
-        testset, batch_size=100, shuffle=True)
+        testset, batch_size=4, shuffle=True)
 
     model = RecurrentNet(in_dim=6950, hid_dim=100, num_hid=2, out_dim=2,
                          dropout=0.5)
@@ -155,7 +156,8 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
     criterion = MSELoss
-
+ 
     trainRecurrentNet(model=model, trainloader=trainloader, testloader=testloader,
-                      optimizer=optimizer, criterion=criterion, n_batch=30,
-                      seq_len=100, grad_clip=10, device=device)
+                      optimizer=optimizer, criterion=criterion, nb_epoch=30,
+                      grad_clip=10, device=device)
+

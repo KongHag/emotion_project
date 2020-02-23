@@ -28,8 +28,8 @@ parser.add_argument("--batch-size", default=32,
 parser.add_argument("--grad-clip", default=10, type=float,
                     help="Boundaries of the gradient clipping function (centered on 0)")
 # parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
-parser.add_argument("--nb-batch", default=100,
-                    type=int, help="Number of batches")
+parser.add_argument("--nb-epoch", default=100,
+                    type=int, help="Number of epoch")
 parser.add_argument("-O", "--optimizer", default="Adam",
                     choices=["Adam", "RMSprop"], help="Type of optimizer")
 parser.add_argument("-C", "--crit", default="MSE",
@@ -56,8 +56,8 @@ def run(args):
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
         num_workers=10)
-    testset = MediaEval18(
-        root='./data', train=False, seq_len=getattr(args, 'seq_len'), nb_sequences=200, shuffle=True)
+    testset = MediaEval18( 
+        root='./data', train=False, seq_len=getattr(args, 'seq_len'), nb_sequences=256 ,shuffle=True)
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=getattr(args, 'batch_size'), shuffle=True,
         num_workers=10)
@@ -83,8 +83,7 @@ def run(args):
                       trainloader=trainloader, testloader=testloader,
                       optimizer=optimizer,
                       criterion=getattr(args, 'crit'),
-                      n_batch=getattr(args, 'nb_batch'),
-                      seq_len=getattr(args, 'seq_len'),
+                      nb_epoch=getattr(args, 'nb_epoch'),
                       grad_clip=getattr(args, 'grad_clip'),
                       device=device)
 

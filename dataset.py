@@ -79,7 +79,8 @@ class EmotionDataset(Dataset):
 
 
 class MediaEval18(Dataset):
-    def __init__(self, root='./data', train=True, seq_len=100, shuffle=False, nb_sequences=None):
+    def __init__(self, root='./data', train=True, seq_len=100, shuffle=False,
+                 nb_sequences=None):
         self.root = root
         self.train = train
         self.seq_len = seq_len
@@ -131,8 +132,8 @@ class MediaEval18(Dataset):
             idx = idx.tolist()
         start = self._possible_starts[idx]
         seq = self.get_window(movie_id=start["id_movie"],
-                               seq_len=self.seq_len,
-                               start_idx=start["start_idx"])
+                              seq_len=self.seq_len,
+                              start_idx=start["start_idx"])
         return seq[0].astype("float32"), seq[1].astype("float32")
 
 
@@ -145,10 +146,10 @@ if __name__ == "__main__":
     # print("Y \ttype :", type(Y), "\tshape :", Y.shape)
     # print("Batch building duration :\t%.2f" % (time.time() - start))
 
-    trainset = MediaEval18(root='./data', train=True, seq_len=100, nb_sequences=99)
+    trainset = MediaEval18(root='./data', train=True, seq_len=100)
     trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=10, shuffle=True)
+        trainset, batch_size=128, shuffle=True)
 
+    print(len(trainset))
     for i, data in enumerate(trainloader):
         print(i, data[0].shape)
-
