@@ -30,8 +30,8 @@ parser.add_argument("--grad-clip", default=10, type=float,
 # parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
 parser.add_argument("--nb-epoch", default=100,
                     type=int, help="Number of epoch")
-parser.add_argument("-O", "--optimizer", default="Adam",
-                    choices=["Adam", "RMSprop"], help="Type of optimizer")
+# parser.add_argument("-O", "--optimizer", default="Adam",
+#                     choices=["Adam", "RMSprop"], help="Type of optimizer")
 parser.add_argument("-C", "--crit", default="MSE",
                     choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
 parser.add_argument("-B", "--bidirect", default=False,
@@ -55,12 +55,12 @@ def run(args):
         root='./data', train=True, seq_len=getattr(args, 'seq_len'))
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
-        num_workers=10)
-    testset = MediaEval18( 
-        root='./data', train=False, seq_len=getattr(args, 'seq_len'), nb_sequences=256 ,shuffle=True)
+        num_workers=8)
+    testset = MediaEval18(
+        root='./data', train=False, seq_len=getattr(args, 'seq_len'), nb_sequences=256, shuffle=True)
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=getattr(args, 'batch_size'), shuffle=True,
-        num_workers=10)
+        num_workers=8)
     logger.debug("dataset/dataloader initialized")
 
     # Model initilisation
@@ -91,12 +91,12 @@ def run(args):
 if __name__ == '__main__':
     # Parse args
     args = parser.parse_args()
+    logger = logging.getLogger()
+    logger.setLevel(getattr(args, 'logger_level'))
+
     for arg in vars(args):
         logger.info(
             "initialization -- {} - {}".format(arg, getattr(args, arg)))
-
-    logger = logging.getLogger()
-    logger.setLevel(getattr(args, 'logger_level'))
 
     try:
         run(args)
