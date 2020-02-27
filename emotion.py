@@ -57,7 +57,7 @@ def run(args):
         trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
         num_workers=8)
     testset = MediaEval18(
-        root='./data', train=False, seq_len=getattr(args, 'seq_len'), nb_sequences=256, shuffle=True)
+        root='./data', train=False, seq_len=getattr(args, 'seq_len'), shuffle=True)
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=getattr(args, 'batch_size'), shuffle=True,
         num_workers=8)
