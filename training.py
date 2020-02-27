@@ -81,8 +81,6 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
     logger.info("start training")
     if criterion == "MSE":
         criterion = MSELoss
-    elif criterion == "Pearson":
-        criterion = PearsonLoss
 
     train_losses, test_losses = [], []
     for epoch in range(nb_epoch):
