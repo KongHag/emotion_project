@@ -59,6 +59,7 @@ def store(model):
 
 def compute_test_loss(model, testloader, optimizer, criterion, device):
     losses = []
+    eval_losses = []
     for idx_batch, (X, Y) in enumerate(testloader):
         logger.debug("Starting testing with batch {}".format(idx_batch))
 
@@ -81,9 +82,14 @@ def compute_test_loss(model, testloader, optimizer, criterion, device):
         gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
         logger.debug("output computed")
         loss = criterion(gpu_output, gpu_Y)
+        V,A = MSELoss_V_A(gpu_output, gpu_Y)
+        r_V, r_A = PearsonCoefficient(gpu_output, gpu_Y) 
+        eval_losses.append([V,A,r_V,r_A])
+        eval_losses = torch.tensor(eval_losses, device=device).float()
         losses.append(float(loss))
         logger.debug("loss computed : {}".format(loss))
-    return np.mean(losses)
+    means = torch.mean(eval_losses,dim = 0)
+    return np.mean(losses), means
 
 
 def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
@@ -92,7 +98,7 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
     if criterion == "MSE":
         criterion = MSELoss
     elif criterion == "Pearson":
-        criterion = PearsonLoss
+        criterion = PearsonCoefficient
 
     train_losses, test_losses = [], []
     for epoch in range(nb_epoch):
@@ -138,11 +144,13 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
 
         logger.info(f'Epoch : {epoch}')
         train_losses.append((idx_batch, float(loss)))
-        test_loss = compute_test_loss(
+        test_loss, eval_loss = compute_test_loss(
                 model, testloader, optimizer, criterion, device)
         test_losses.append((idx_batch, test_loss))
         logger.info(f"Test loss : {test_loss : 3f}")
         logger.info(f"Train loss : {loss : 3f}")
+        logger.info("Eval loss : MSE Valence : {0}, MSE Arousal : {1}, Pearson Valence {2}, Pearson Arousal {3}".format(*eval_loss))
+        
 
         if epoch % 20 == 0:
             pickle.dump(train_losses, open("data/train_losses.pickle", "wb"))
