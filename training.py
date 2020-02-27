@@ -42,7 +42,7 @@ def PearsonCoefficient(x, y):
     mean_y = torch.mean(y, axis=1)
     xm = x.sub(mean_x.unsqueeze(-1))
     ym = y.sub(mean_y.unsqueeze(-1))
-    r_num = xm.dot(ym)
+    r_num = torch.mul(xm, ym)
     r_den = torch.norm(xm, 2) * torch.norm(ym, 2)
     r_val = r_num / r_den
     return r_val
