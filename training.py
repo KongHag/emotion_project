@@ -39,27 +39,24 @@ def MSELoss_V_A(batch_predict, batch_label):
 
 
 def PearsonCoefficient(x, y):
-    mean_x = torch.mean(x)
-    mean_y = torch.mean(y)
-    xm = x.sub(mean_x)
-    ym = y.sub(mean_y)
-    r_num = xm.dot(ym)
+    mean_x = torch.mean(x, axis=1)
+    mean_y = torch.mean(y, axis=1)
+    xm = x.sub(mean_x.unsqueeze(-1))
+    ym = y.sub(mean_y.unsqueeze(-1))
+    r_num = torch.mul(xm, ym)
     r_den = torch.norm(xm, 2) * torch.norm(ym, 2)
     r_val = r_num / r_den
     return r_val
 
 
 def Pearson_V_A(batch_predict, batch_label):
-    size = list(batch_predict.size())
-    batch_predict_reshaped_V = batch_predict.view(-1, size[2])[:, 0]
-    batch_label_reshaped_V = batch_label.view(-1, size[2])[:, 0]
-    batch_predict_reshaped_A = batch_predict.view(-1, size[2])[:, 1]
-    batch_label_reshaped_A = batch_label.view(-1, size[2])[:, 1]
+    batch_label_A = batch_label[:][:][0]
+    batch_predict_A = batch_predict[:][:][0]
+    batch_label_V = batch_label[:][:][1]
+    batch_predict_V = batch_predict[:][:][1]
 
-    pearson_V = PearsonCoefficient(
-        batch_predict_reshaped_V, batch_label_reshaped_V)
-    pearson_A = PearsonCoefficient(
-        batch_predict_reshaped_A, batch_label_reshaped_A)
+    pearson_A = PearsonCoefficient(batch_predict_A, batch_label_A)
+    pearson_V = PearsonCoefficient(batch_predict_V, batch_label_V)
     return pearson_V, pearson_A
 
 
@@ -93,11 +90,9 @@ def compute_test_loss(model, testloader, optimizer, criterion, device):
         logger.debug("output computed")
 
         loss = criterion(gpu_output, gpu_Y)
-        logger.debug("loss computed")
-
-        V, A = MSELoss_V_A(gpu_output, gpu_Y)
-        r_V, r_A = Pearson_V_A(gpu_output, gpu_Y)
-        eval_losses.append([V, A, r_V, r_A])
+        V,A = MSELoss_V_A(gpu_output, gpu_Y)
+        r_V, r_A = Pearson_V_A(gpu_output, gpu_Y) 
+        eval_losses.append([V,A,r_V,r_A])
         losses.append(float(loss))
         logger.debug("loss computed : {}".format(loss))
 
@@ -149,8 +144,9 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
             logger.debug("loss backwarded")
 
             # Gradient clip
-            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-            logger.debug("grad clipped")
+            if grad_clip != None:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+                logger.debug("grad clipped")
 
             # Optimizer step
             optimizer.step()
