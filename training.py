@@ -34,13 +34,10 @@ def MSELoss_V_A(batch_predict, batch_label):
     batch_label_reshaped_A = batch_label.view(-1, size[2])[:,1]
     loss = torch.nn.MSELoss()
     
-    return loss(batch_predict_reshaped_V, batch_label_reshaped_A), loss(batch_predict_reshaped_A, batch_label_reshaped_A)
+    return loss(batch_predict_reshaped_V, batch_label_reshaped_V), loss(batch_predict_reshaped_A, batch_label_reshaped_A)
 
 
-def PearsonCoefficient(batch_predict, batch_label):
-    size = list(batch_predict.size())
-    x = batch_predict.view(-1, size[2])
-    y = batch_label.view(-1, size[2])
+def PearsonCoefficient(x, y):
     mean_x = torch.mean(x)
     mean_y = torch.mean(y)
     xm = x.sub(mean_x)
@@ -49,6 +46,18 @@ def PearsonCoefficient(batch_predict, batch_label):
     r_den = torch.norm(xm, 2) * torch.norm(ym, 2)
     r_val = r_num / r_den
     return r_val
+
+def Pearson_V_A(batch_predict, batch_label):
+    size = list(batch_predict.size())
+    batch_predict_reshaped_V = batch_predict.view(-1, size[2])[:,0]
+    batch_label_reshaped_V = batch_label.view(-1, size[2])[:,0]
+    batch_predict_reshaped_A = batch_predict.view(-1, size[2])[:,1]
+    batch_label_reshaped_A = batch_label.view(-1, size[2])[:,1]
+
+    pearson_V = PearsonCoefficient(batch_predict_reshaped_V, batch_label_reshaped_V)
+    pearson_A = PearsonCoefficient(batch_predict_reshaped_A, batch_label_reshaped_A)
+    return pearson_V, pearson_A
+
 
 
 def store(model):
@@ -99,6 +108,7 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
         criterion = MSELoss
     elif criterion == "Pearson":
         criterion = PearsonCoefficient
+
 
     train_losses, test_losses = [], []
     for epoch in range(nb_epoch):

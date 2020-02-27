@@ -30,8 +30,8 @@ parser.add_argument("--grad-clip", default=10, type=float,
 # parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
 parser.add_argument("--nb-epoch", default=100,
                     type=int, help="Number of epoch")
-# parser.add_argument("-O", "--optimizer", default="Adam",
-#                     choices=["Adam", "RMSprop"], help="Type of optimizer")
+parser.add_argument("-O", "--optimizer", default="Adam",
+                    choices=["Adam", "RMSprop", "SGD"], help="Type of optimizer")
 parser.add_argument("-C", "--crit", default="MSE",
                     choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
 parser.add_argument("-B", "--bidirect", default=False,
@@ -72,8 +72,16 @@ def run(args):
     model.to(device)
     logger.info("model : {}".format(model))
 
-    optimizer = torch.optim.Adam(
-        model.parameters(), lr=getattr(args, 'lr'))
+    attr_optimizer = getattr(args, 'optimizer')
+    if attr_optimizer == 'Adam':
+        optimizer = torch.optim.Adam(
+            model.parameters(), lr=getattr(args, 'lr'))
+    if attr_optimizer == 'RMSprop':
+        optimizer = torch.optim.RMSprop(
+            model.parameters(), lr=getattr(args, 'lr'))
+    if attr_optimizer == 'SGD':
+        optimizer = torch.optim.SGD(
+            model.parameters(), lr=getattr(args, 'lr'))
     logger.debug("optimizer : {}".format(optimizer))
 
     criterion = MSELoss
