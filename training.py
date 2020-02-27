@@ -26,6 +26,16 @@ def MSELoss(batch_predict, batch_label):
     loss = torch.nn.MSELoss()
     return loss(batch_predict_reshaped, batch_label_reshaped)
 
+def MSELoss_V_A(batch_predict, batch_label):
+    size = list(batch_predict.size())
+    batch_predict_reshaped_V = batch_predict.view(-1, size[2])[:,0]
+    batch_label_reshaped_V = batch_label.view(-1, size[2])[:,0]
+    batch_predict_reshaped_A = batch_predict.view(-1, size[2])[:,1]
+    batch_label_reshaped_A = batch_label.view(-1, size[2])[:,1]
+    loss = torch.nn.MSELoss()
+    
+    return loss(batch_predict_reshaped_V, batch_label_reshaped_A), loss(batch_predict_reshaped_A, batch_label_reshaped_A)
+
 
 def PearsonLoss(batch_predict, batch_label):
     return 0
