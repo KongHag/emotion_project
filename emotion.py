@@ -31,7 +31,7 @@ parser.add_argument("--grad-clip", default=10, type=float,
 parser.add_argument("--nb-epoch", default=100,
                     type=int, help="Number of epoch")
 parser.add_argument("-O", "--optimizer", default="Adam",
-                    choices=["Adam", "RMSprop"], help="Type of optimizer")
+                    choices=["Adam", "RMSprop", "SGD"], help="Type of optimizer")
 parser.add_argument("-C", "--crit", default="MSE",
                     choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
 parser.add_argument("-B", "--bidirect", default=False,
@@ -78,6 +78,9 @@ def run(args):
             model.parameters(), lr=getattr(args, 'lr'))
     if attr_optimizer == 'RMSprop':
         optimizer = torch.optim.RMSprop(
+            model.parameters(), lr=getattr(args, 'lr'))
+    if attr_optimizer == 'SGD':
+        optimizer = torch.optim.SGD(
             model.parameters(), lr=getattr(args, 'lr'))
     logger.debug("optimizer : {}".format(optimizer))
 
