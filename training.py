@@ -144,8 +144,9 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
             logger.debug("loss backwarded")
 
             # Gradient clip
-            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-            logger.debug("grad clipped")
+            if grad_clip != None:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+                logger.debug("grad clipped")
 
             # Optimizer step
             optimizer.step()
