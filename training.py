@@ -94,9 +94,9 @@ def compute_test_loss(model, testloader, optimizer, criterion, device):
         V,A = MSELoss_V_A(gpu_output, gpu_Y)
         r_V, r_A = PearsonCoefficient(gpu_output, gpu_Y) 
         eval_losses.append([V,A,r_V,r_A])
-        eval_losses = torch.tensor(eval_losses, device=device).float()
         losses.append(float(loss))
         logger.debug("loss computed : {}".format(loss))
+    eval_losses = torch.tensor(eval_losses, device=device).float()
     means = torch.mean(eval_losses,dim = 0)
     return np.mean(losses), means
 
