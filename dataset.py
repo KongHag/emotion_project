@@ -86,7 +86,7 @@ class MediaEval18(Dataset):
         shuffle (bool, optional) : default False. Shuffle or not the data
         fragment (float, optional) : default 1. From 0 to 1, percent of dataset used
     """
-    _visual_feature_len = {
+    _features_len = {
         "acc": [0, 256],
         "cedd": [256, 400],
         "cl": [400, 433],
@@ -97,16 +97,17 @@ class MediaEval18(Dataset):
         "sc": [933, 997],
         "tamura": [997, 1015],
         "lbp": [1015, 1271],
-        "fc6": [1271, 5367]
+        "fc6": [1271, 5367],
+        "audio": [5367, 6960]
     }
 
     def __init__(self, root='./data', train=True, seq_len=100, shuffle=False,
-                 fragment=1, use_audio_feature=True, visual_features=['all']):
+                 fragment=1, use_audio_feature=True, features=['all']):
         self.root = root
         self.train = train
         self.seq_len = seq_len
         self.shuffle = shuffle
-        self.visual_features = visual_features
+        self.features = features
         self._data_to_sequences_list(fragment)
 
     def _data_to_sequences_list(self, fragment):
@@ -147,8 +148,8 @@ class MediaEval18(Dataset):
 
     def _select_features(self, X):
         new_seq = []
-        for feature_name, idxs in self._visual_feature_len.items():
-            if feature_name in self.visual_features or 'all' in self.visual_features:
+        for feature_name, idxs in self._features_len.items():
+            if feature_name in self.features or 'all' in self.features:
                 new_seq.append(X[:, idxs[0]:idxs[1]])
         return np.concatenate(new_seq, axis=1)
 
@@ -162,9 +163,7 @@ class MediaEval18(Dataset):
         X, Y = self.get_window(movie_id=start["id_movie"],
                               seq_len=self.seq_len,
                               start_idx=start["start_idx"])
-        #X_visual_features = self._select_features(X)
-
-
+        X = self._select_features(X)
         return X.astype("float32"), Y.astype("float32")
 
 
@@ -177,7 +176,7 @@ if __name__ == "__main__":
     # print("Y \ttype :", type(Y), "\tshape :", Y.shape)
     # print("Batch building duration :\t%.2f" % (time.time() - start))
 
-    trainset = MediaEval18(root='./data', train=True, seq_len=100, visual_features=['cl', 'fc6'])
+    trainset = MediaEval18(root='./data', train=True, seq_len=100, features=['cl', 'fc6'], fragment=0.02)
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=128, shuffle=True)
 
