@@ -27,7 +27,7 @@ Erreurs trouvées dans les données:
 import numpy as np
 import pickle
 from log import setup_custom_logger
-import arff
+
 
 logger = setup_custom_logger("Read data")
 
@@ -233,6 +233,7 @@ def load_data():
 
 
 if __name__ == '__main__':
+    import arff
     X, Y = load_data()
     for i, (x, y) in enumerate(zip(X, Y)):
         print(i, len(x), len(y))
