@@ -176,7 +176,7 @@ if __name__ == "__main__":
     # print("Y \ttype :", type(Y), "\tshape :", Y.shape)
     # print("Batch building duration :\t%.2f" % (time.time() - start))
 
-    trainset = MediaEval18(root='./data', train=True, seq_len=100, features=['cl', 'fc6'], fragment=0.02)
+    trainset = MediaEval18(root='./data', train=True, seq_len=100, features=['cl'], fragment=0.005)
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=128, shuffle=True)
 

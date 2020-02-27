@@ -18,12 +18,10 @@ parser.add_argument("--seq-len", default=100, type=int,
                     help="Length of a sequence")
 parser.add_argument("--num-hidden", default=1, type=int,
                     help="Number of hidden layers in NN")
-parser.add_argument("--hidden-dim", default=1000, type=int,
+parser.add_argument("--hidden-dim", default=32, type=int,
                     help="Dimension of hidden layer")
 parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate")
-parser.add_argument("--input-size", default=6950, type=int,
-                    help="Size of the input dataset")
-parser.add_argument("--batch-size", default=32,
+parser.add_argument("--batch-size", default=128,
                     type=int, help="Size of a batch")
 parser.add_argument("--grad-clip", default=10, type=float,
                     help="Boundaries of the gradient clipping function (centered on 0)")
@@ -38,7 +36,7 @@ parser.add_argument("-B", "--bidirect", default=False,
                     type=bool, help="Whether to use bidirectional")
 parser.add_argument("-R", "--regularisation",
                     choices=["L1", "L2"], help="Type of regularization (L1 or L2)")
-parser.add_argument("-D", "--dropout", default=0, type=float,
+parser.add_argument("-D", "--dropout", default=0.4, type=float,
                     help="Dropout probability between [0, 1]")
 parser.add_argument("--logger-level", default=20, type=int,
                     help="logger level from 10 (debug) to 50 (critical)")
@@ -52,19 +50,22 @@ def run(args):
 
     # Init dataset
     trainset = MediaEval18(
-        root='./data', train=True, seq_len=getattr(args, 'seq_len'))
+        root='./data', train=True, seq_len=getattr(args, 'seq_len'),
+        shuffle=True, fragment=0.001, features=['fc6'])
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
         num_workers=8)
     testset = MediaEval18(
-        root='./data', train=False, seq_len=getattr(args, 'seq_len'), shuffle=True)
+        root='./data', train=False, seq_len=getattr(args, 'seq_len'),
+        shuffle=True, fragment=0.001, features=['fc6'])
     testloader = torch.utils.data.DataLoader(
-        testset, batch_size=getattr(args, 'batch_size'), shuffle=True,
+        testset, batch_size=getattr(args, 'batch_size'),
         num_workers=8)
-    logger.debug("dataset/dataloader initialized")
+    logger.info(
+        "dataset/dataloader initialized : train set lenght : {}  test set leght : {}".format(len(trainset), len(testset)))
 
     # Model initilisation
-    model = RecurrentNet(in_dim=getattr(args, 'input_size'),
+    model = RecurrentNet(in_dim=next(iter(trainset))[0].shape[1],
                          hid_dim=getattr(args, 'hidden_dim'),
                          num_hid=getattr(args, 'num_hidden'),
                          out_dim=2,
