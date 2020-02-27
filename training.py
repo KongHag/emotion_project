@@ -34,7 +34,7 @@ def MSELoss_V_A(batch_predict, batch_label):
     batch_label_reshaped_A = batch_label.view(-1, size[2])[:,1]
     loss = torch.nn.MSELoss()
     
-    return loss(batch_predict_reshaped_V, batch_label_reshaped_A), loss(batch_predict_reshaped_A, batch_label_reshaped_A)
+    return loss(batch_predict_reshaped_V, batch_label_reshaped_V), loss(batch_predict_reshaped_A, batch_label_reshaped_A)
 
 
 def PearsonCoefficient(x, y):
