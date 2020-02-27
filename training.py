@@ -26,9 +26,29 @@ def MSELoss(batch_predict, batch_label):
     loss = torch.nn.MSELoss()
     return loss(batch_predict_reshaped, batch_label_reshaped)
 
+def MSELoss_V_A(batch_predict, batch_label):
+    size = list(batch_predict.size())
+    batch_predict_reshaped_V = batch_predict.view(-1, size[2])[:,0]
+    batch_label_reshaped_V = batch_label.view(-1, size[2])[:,0]
+    batch_predict_reshaped_A = batch_predict.view(-1, size[2])[:,1]
+    batch_label_reshaped_A = batch_label.view(-1, size[2])[:,1]
+    loss = torch.nn.MSELoss()
+    
+    return loss(batch_predict_reshaped_V, batch_label_reshaped_A), loss(batch_predict_reshaped_A, batch_label_reshaped_A)
 
-def PearsonLoss(batch_predict, batch_label):
-    return 0
+
+def PearsonCoefficient(batch_predict, batch_label):
+    size = list(batch_predict.size())
+    x = batch_predict.view(-1, size[2])
+    y = batch_label.view(-1, size[2])
+    mean_x = torch.mean(x)
+    mean_y = torch.mean(y)
+    xm = x.sub(mean_x)
+    ym = y.sub(mean_y)
+    r_num = xm.dot(ym)
+    r_den = torch.norm(xm, 2) * torch.norm(ym, 2)
+    r_val = r_num / r_den
+    return r_val
 
 
 def store(model):
@@ -71,8 +91,6 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
     logger.info("start training")
     if criterion == "MSE":
         criterion = MSELoss
-    elif criterion == "Pearson":
-        criterion = PearsonLoss
 
     train_losses, test_losses = [], []
     for epoch in range(nb_epoch):
