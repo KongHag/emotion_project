@@ -79,16 +79,23 @@ class EmotionDataset(Dataset):
 
 
 class MediaEval18(Dataset):
+    """Mediaeval dataset
+        root (str, otpional) : default './data'. Path to data pickle
+        train (bool, optional) : default True. trainset if True, testset otherwise
+        seq_len (int, seq_len) : default 100. nb of frame in a single sample
+        shuffle (bool, optional) : default False. Shuffle or not the data
+        fragment (float, optional) : default 1. From 0 to 1, percent of dataset used
+    """
     def __init__(self, root='./data', train=True, seq_len=100, shuffle=False,
-                 nb_sequences=None):
+                 fragment=1, use_audio_feature=True, visual_features=['all']):
         self.root = root
         self.train = train
         self.seq_len = seq_len
         self.shuffle = shuffle
-        self.nb_sequences = nb_sequences
-        self._data_to_sequences_list()
+        self._data_to_sequences_list(fragment)
+        
 
-    def _data_to_sequences_list(self):
+    def _data_to_sequences_list(self, fragment):
         if self.train:
             self.data = load_data()[0][:50], load_data()[1][:50]
         else:
@@ -98,8 +105,8 @@ class MediaEval18(Dataset):
         if self.shuffle:
             np.random.shuffle(self._possible_starts)
 
-        if self.nb_sequences is not None:
-            self._possible_starts = self._possible_starts[:self.nb_sequences]
+        nb_sequences=int(self._possible_starts*fragment)
+        self._possible_starts = self._possible_starts[:nb_sequences]
 
     def _compute_possible_starts(self):
         for movie_id, (movie_features, movie_VA) in enumerate(zip(*self.data)):

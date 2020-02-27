@@ -27,6 +27,7 @@ Erreurs trouvées dans les données:
 import numpy as np
 import pickle
 from log import setup_custom_logger
+import arff
 
 logger = setup_custom_logger("Read data")
 
@@ -211,12 +212,12 @@ def dump_data():
             continue
         X = all_features(movie_id)
 
-        logger.info("FEATURES\tmovie :", movie_id,
-              "\tArray shape :", X.shape)
+        logger.info(' '.join(("FEATURES\tmovie :", movie_id,
+              "\tArray shape :", X.shape)))
 
         Y = valence_arousal(movie_id)
-        logger.info("OUTPUT\tmovie :", movie_id,
-              "\tArray shape :", Y.shape)
+        logger.info(' '.join(("OUTPUT\tmovie :", movie_id,
+                    "\tArray shape :", Y.shape)))
 
         XX.append(X)
         YY.append(Y)
