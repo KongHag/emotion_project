@@ -86,14 +86,28 @@ class MediaEval18(Dataset):
         shuffle (bool, optional) : default False. Shuffle or not the data
         fragment (float, optional) : default 1. From 0 to 1, percent of dataset used
     """
+    _visual_feature_len = {
+        "acc": [0, 256],
+        "cedd": [256, 400],
+        "cl": [400, 433],
+        "eh": [433, 513],
+        "fcth": [513, 705],
+        "gabor": [705, 765],
+        "jcd": [765, 933],
+        "sc": [933, 997],
+        "tamura": [997, 1015],
+        "lbp": [1015, 1271],
+        "fc6": [1271, 5367]
+    }
+
     def __init__(self, root='./data', train=True, seq_len=100, shuffle=False,
                  fragment=1, use_audio_feature=True, visual_features=['all']):
         self.root = root
         self.train = train
         self.seq_len = seq_len
         self.shuffle = shuffle
+        self.visual_features = visual_features
         self._data_to_sequences_list(fragment)
-        
 
     def _data_to_sequences_list(self, fragment):
         if self.train:
@@ -105,7 +119,7 @@ class MediaEval18(Dataset):
         if self.shuffle:
             np.random.shuffle(self._possible_starts)
 
-        nb_sequences=int(self._possible_starts*fragment)
+        nb_sequences=int(len(self._possible_starts)*fragment)
         self._possible_starts = self._possible_starts[:nb_sequences]
 
     def _compute_possible_starts(self):
@@ -131,6 +145,13 @@ class MediaEval18(Dataset):
         return (movie_features[start_idx:start_idx+seq_len, :],
                 movie_VA[start_idx:start_idx+seq_len, :])
 
+    def _select_features(self, X):
+        new_seq = []
+        for feature_name, idxs in self._visual_feature_len.items():
+            if feature_name in self.visual_features or 'all' in self.visual_features:
+                new_seq.append(X[:, idxs[0]:idxs[1]])
+        return np.concatenate(new_seq, axis=1)
+
     def __len__(self):
         return len(self._possible_starts)
 
@@ -138,10 +159,13 @@ class MediaEval18(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         start = self._possible_starts[idx]
-        seq = self.get_window(movie_id=start["id_movie"],
+        X, Y = self.get_window(movie_id=start["id_movie"],
                               seq_len=self.seq_len,
                               start_idx=start["start_idx"])
-        return seq[0].astype("float32"), seq[1].astype("float32")
+        #X_visual_features = self._select_features(X)
+
+
+        return X.astype("float32"), Y.astype("float32")
 
 
 if __name__ == "__main__":
@@ -153,7 +177,7 @@ if __name__ == "__main__":
     # print("Y \ttype :", type(Y), "\tshape :", Y.shape)
     # print("Batch building duration :\t%.2f" % (time.time() - start))
 
-    trainset = MediaEval18(root='./data', train=True, seq_len=100)
+    trainset = MediaEval18(root='./data', train=True, seq_len=100, visual_features=['cl', 'fc6'])
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=128, shuffle=True)
 
