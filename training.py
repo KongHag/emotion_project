@@ -37,8 +37,18 @@ def MSELoss_V_A(batch_predict, batch_label):
     return loss(batch_predict_reshaped_V, batch_label_reshaped_A), loss(batch_predict_reshaped_A, batch_label_reshaped_A)
 
 
-def PearsonLoss(batch_predict, batch_label):
-    return 0
+def PearsonCoefficient(batch_predict, batch_label):
+    size = list(batch_predict.size())
+    x = batch_predict.view(-1, size[2])
+    y = batch_label.view(-1, size[2])
+    mean_x = torch.mean(x)
+    mean_y = torch.mean(y)
+    xm = x.sub(mean_x)
+    ym = y.sub(mean_y)
+    r_num = xm.dot(ym)
+    r_den = torch.norm(xm, 2) * torch.norm(ym, 2)
+    r_val = r_num / r_den
+    return r_val
 
 
 def store(model):
