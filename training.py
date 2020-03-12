@@ -7,7 +7,7 @@ Created on Thu Feb  6 11:01:37 2020
 
 from dataset import EmotionDataset
 from dataset import MediaEval18
-from model import RecurrentNet
+from model import RecurrentNet, FCNet
 import numpy as np
 import torch
 from log import setup_custom_logger
@@ -63,7 +63,7 @@ def Pearson_V_A(batch_predict, batch_label):
 def store(model):
     if not os.path.exists('models'):
         os.makedirs('models')
-    torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
+    torch.save(model.state_dict(), f='./models/FCNet.pt')
 
 
 def compute_test_loss(model, testloader, optimizer, criterion, device):
@@ -169,7 +169,7 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
             store(model)
 
     # TODO Add Loss plotting
-    torch.save(model.state_dict(), f='./models/RecurrentNet.pt')
+    torch.save(model.state_dict(), f='./models/FCNet.pt')
 
 
 if __name__ == '__main__':
@@ -181,16 +181,14 @@ if __name__ == '__main__':
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
     trainset = MediaEval18(root='./data', train=True,
-                           seq_len=100, nb_sequences=100, shuffle=True)
+                           fragment = 0.01, shuffle=True)
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=4, shuffle=True)
-    testset = MediaEval18(root='./data', train=False, seq_len=100,
-                          nb_sequences=8, shuffle=True)
+    testset = MediaEval18(root='./data', train=False, fragment = 0.01, shuffle=True)
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=4, shuffle=True)
 
-    model = RecurrentNet(in_dim=6950, hid_dim=100, num_hid=2, out_dim=2,
-                         dropout=0.5)
+    model = FCNet()
     logger.info("neural network : {}".format(model))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
