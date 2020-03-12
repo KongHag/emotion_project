@@ -14,7 +14,7 @@ logger = setup_custom_logger("emotion")
 parser = argparse.ArgumentParser(
     description='Train Neural Network for emotion predictions')
 
-parser.add_argument("--seq-len", default=100, type=int,
+parser.add_argument("--seq-len", default=20, type=int,
                     help="Length of a sequence")
 parser.add_argument("--num-hidden", default=1, type=int,
                     help="Number of hidden layers in NN")
@@ -34,9 +34,9 @@ parser.add_argument("-C", "--crit", default="MSE",
                     choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
 parser.add_argument("-B", "--bidirect", default=False,
                     type=bool, help="Whether to use bidirectional")
-parser.add_argument("-R", "--regularisation",
-                    choices=["L1", "L2"], help="Type of regularization (L1 or L2)")
-parser.add_argument("-D", "--dropout", default=0.4, type=float,
+# parser.add_argument("-R", "--regularisation",
+#                     choices=["L1", "L2"], help="Type of regularization (L1 or L2)")
+parser.add_argument("-D", "--dropout", default=0.25, type=float,
                     help="Dropout probability between [0, 1]")
 parser.add_argument("--logger-level", default=20, type=int,
                     help="logger level from 10 (debug) to 50 (critical)")
