@@ -157,12 +157,12 @@ if __name__ == '__main__':
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
     trainset = MediaEval18(root='./data', train=True,
-                           fragment = 0.01, shuffle=True, features=[
+                           fragment = 1, shuffle=True, features=[
                                "acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
                                "sc", "tamura", "lbp", "fc6"])
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=4, shuffle=True)
-    testset = MediaEval18(root='./data', train=False, fragment = 0.01, shuffle=True, features=[
+    testset = MediaEval18(root='./data', train=False, fragment = 1, shuffle=True, features=[
                                "acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
                                "sc", "tamura", "lbp", "fc6"])
     testloader = torch.utils.data.DataLoader(
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     model = FCNet()
     logger.info("neural network : {}".format(model))
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
 
     criterion = torch.nn.MSELoss()
 
