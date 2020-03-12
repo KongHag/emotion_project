@@ -5,7 +5,6 @@ Created on Thu Feb  6 11:01:37 2020
 @author: Tim
 """
 
-from dataset import EmotionDataset
 from dataset import MediaEval18
 from model import RecurrentNet, FCNet
 import numpy as np
@@ -19,12 +18,8 @@ logger = setup_custom_logger('Model training')
 
 
 def MSELoss(batch_predict, batch_label):
-    size = list(batch_predict.size())
-    batch_predict_reshaped = batch_predict.view(-1, size[2])
-    batch_label_reshaped = batch_label.view(-1, size[2])
-
     loss = torch.nn.MSELoss()
-    return loss(batch_predict_reshaped, batch_label_reshaped)
+    return loss(batch_predict, batch_label)
 
 
 def MSELoss_V_A(batch_predict, batch_label):
@@ -79,36 +74,20 @@ def compute_test_loss(model, testloader, optimizer, criterion, device):
         gpu_Y = Y.to(device=device, dtype=torch.float32)
         logger.debug("X, Y copied on device {}".format(device))
 
-        # Init hidden layer input
-        hidden, cell = model.initHelper(gpu_X.shape[0])
-        gpu_hidden = hidden.to(device=device)
-        gpu_cell = cell.to(device=device)
-        logger.debug("hidden layer and cell initialized")
-
         # Output and loss computation
-        gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
+        gpu_output = model(gpu_X)
         logger.debug("output computed")
 
         loss = criterion(gpu_output, gpu_Y)
-        # V,A = MSELoss_V_A(gpu_output, gpu_Y)
-        # r_V, r_A = Pearson_V_A(gpu_output, gpu_Y) 
-        # eval_losses.append([V,A,r_V,r_A])
         losses.append(float(loss))
         logger.debug("loss computed : {}".format(loss))
 
-    #logger.debug(str(eval_losses))
-    #eval_losses = torch.tensor(eval_losses, device=device).float()
-    #means = torch.mean(eval_losses, dim=0)
-    return np.mean(losses)# means
+    return np.mean(losses)
   
 
 def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
                       nb_epoch, grad_clip, device):
     logger.info("start training")
-    if criterion == "MSE":
-        criterion = MSELoss
-    elif criterion == "Pearson":
-        criterion = PearsonCoefficient
 
     train_losses, test_losses = [], []
     for epoch in range(nb_epoch):
@@ -129,13 +108,10 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
             logger.debug("X, Y copied on device {}".format(device))
 
             # Init hidden layer input
-            hidden, cell = model.initHelper(gpu_X.shape[0])
-            gpu_hidden = hidden.to(device=device)
-            gpu_cell = cell.to(device=device)
             logger.debug("hidden layer and cell initialized")
 
             # Output and loss computation
-            gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
+            gpu_output = model(gpu_X)
             logger.debug("output computed")
             loss = criterion(gpu_output, gpu_Y)
             logger.debug("loss computed : {}".format(loss))
@@ -181,19 +157,23 @@ if __name__ == '__main__':
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
     trainset = MediaEval18(root='./data', train=True,
-                           fragment = 0.01, shuffle=True)
+                           fragment = 0.01, shuffle=True, features=[
+                               "acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
+                               "sc", "tamura", "lbp", "fc6"])
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=4, shuffle=True)
-    testset = MediaEval18(root='./data', train=False, fragment = 0.01, shuffle=True)
+    testset = MediaEval18(root='./data', train=False, fragment = 0.01, shuffle=True, features=[
+                               "acc", "cedd", "cl", "eh", "fcth", "gabor", "jcd",
+                               "sc", "tamura", "lbp", "fc6"])
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=4, shuffle=True)
 
     model = FCNet()
     logger.info("neural network : {}".format(model))
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-    criterion = MSELoss
+    criterion = torch.nn.MSELoss()
 
     trainRecurrentNet(model=model, trainloader=trainloader, testloader=testloader,
                       optimizer=optimizer, criterion=criterion, nb_epoch=30,
