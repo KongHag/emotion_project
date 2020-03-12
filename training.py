@@ -68,7 +68,7 @@ def store(model):
 
 def compute_test_loss(model, testloader, optimizer, criterion, device):
     losses = []
-    eval_losses = []
+    #eval_losses = []
     for idx_batch, (X, Y) in enumerate(testloader):
         logger.debug("Starting testing with batch {}".format(idx_batch))
 
@@ -90,16 +90,17 @@ def compute_test_loss(model, testloader, optimizer, criterion, device):
         logger.debug("output computed")
 
         loss = criterion(gpu_output, gpu_Y)
-        V,A = MSELoss_V_A(gpu_output, gpu_Y)
-        r_V, r_A = Pearson_V_A(gpu_output, gpu_Y) 
-        eval_losses.append([V,A,r_V,r_A])
+        # V,A = MSELoss_V_A(gpu_output, gpu_Y)
+        # r_V, r_A = Pearson_V_A(gpu_output, gpu_Y) 
+        # eval_losses.append([V,A,r_V,r_A])
         losses.append(float(loss))
         logger.debug("loss computed : {}".format(loss))
 
-    eval_losses = torch.tensor(eval_losses, device=device).float()
-    means = torch.mean(eval_losses, dim=0)
-    return np.mean(losses), means
-
+    #logger.debug(str(eval_losses))
+    #eval_losses = torch.tensor(eval_losses, device=device).float()
+    #means = torch.mean(eval_losses, dim=0)
+    return np.mean(losses)# means
+  
 
 def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
                       nb_epoch, grad_clip, device):
@@ -154,13 +155,13 @@ def trainRecurrentNet(model, trainloader, testloader, optimizer, criterion,
 
         logger.info(f'Epoch : {epoch}')
         train_losses.append((idx_batch, float(loss)))
-        test_loss, eval_loss = compute_test_loss(
+        test_loss = compute_test_loss(
             model, testloader, optimizer, criterion, device)
         test_losses.append((idx_batch, test_loss))
         logger.info(f"Test loss : {test_loss : 3f}")
         logger.info(f"Train loss : {loss : 3f}")
-        logger.info(
-            "Eval loss : MSE Valence : {0}, MSE Arousal : {1}, Pearson Valence {2}, Pearson Arousal {3}".format(*eval_loss))
+        # logger.info(
+        #     "Eval loss : MSE Valence : {0}, MSE Arousal : {1}, Pearson Valence {2}, Pearson Arousal {3}".format(*eval_loss))
 
         if epoch % 20 == 0:
             pickle.dump(train_losses, open("data/train_losses.pickle", "wb"))
