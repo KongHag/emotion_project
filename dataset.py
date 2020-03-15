@@ -52,10 +52,12 @@ class MediaEval18(Dataset):
         self.shuffle = shuffle
         self.features = features
 
+        all_X, all_Y = load_data()
+        i=50
         if self.train:
-            self.data = load_data()[0][:50], load_data()[1][:50]
+            self.data = all_X[:i], all_Y[:i]
         else:
-            self.data = load_data()[0][50:62], load_data()[1][50:62]
+            self.data = all_X[i:62], all_Y[i:62]
 
         self._possible_imgs = list(self._compute_possible_imgs())
         if self.shuffle:
@@ -70,7 +72,7 @@ class MediaEval18(Dataset):
             img_idx = 0
             while img_idx < duration:
                 yield {"id_movie": movie_id, "img_idx": img_idx}
-                img_idx += 1
+                img_idx += 10
 
     def get_img(self, movie_id, img_idx):
         """From a movie_id, returns a sequence of seq_len seconds, starting
@@ -92,8 +94,8 @@ class MediaEval18(Dataset):
         return len(self._possible_imgs)
 
     def __getitem__(self, idx):
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
+        # if torch.is_tensor(idx):
+        #     idx = idx.tolist()
         img = self._possible_imgs[idx]
         X, Y = self.get_img(movie_id=img["id_movie"],
                             img_idx=img["img_idx"])
