@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan 30 09:42:18 2020
+Defines the dataset class MediaEval18.
 
-@author: Tim
+To define a loader that loads shuffled batches of 128 sequences of 20 frames,
+described by visual features only, based on 5% of the whole train dataset:
+>>> trainset = MediaEval18(root='./data', train=True, seq_len=20,
+                           features=['visual'], fragment=0.05)
+>>> trainloader = torch.utils.data.DataLoader(
+        trainset, batch_size=128, shuffle=True)
+>>> for i, data in enumerate(trainloader):
+...     print("Size of the batch", i, ":", data[0].shape)
+Size of the batch 0 : torch.Size([128, 20, 5367])
+Size of the batch 1 : torch.Size([128, 20, 5367])
+Size of the batch 2 : torch.Size([128, 20, 5367])
+Size of the batch 3 : torch.Size([128, 20, 5367])
+...
 
-Usage :
->>> trainset = EmotionDataset()
->>> X, Y = trainset.get_random_training_batch(batch_size=5, seq_len=10)
->>> print("X \ttype :", type(X), "\tshape :", X.shape)
-X       type : <class 'numpy.ndarray'>  shape : (5, 10, 6950)
->>> print("Y \ttype :", type(Y), "\tshape :", Y.shape)
-Y       type : <class 'numpy.ndarray'>  shape : (5, 10, 2)
 """
 
 import torch
@@ -123,8 +128,8 @@ class MediaEval18(Dataset):
         return X.astype("float32"), Y.astype("float32")
 
 if __name__ == "__main__":
-    trainset = MediaEval18(root='./data', train=True,
-                           features=['visual'], fragment=0.005)
+    trainset = MediaEval18(root='./data', train=True, seq_len=20,
+                           features=['visual'], fragment=0.05)
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=128, shuffle=True)
 

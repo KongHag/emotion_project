@@ -6,7 +6,6 @@ Created on Thu Feb  6 11:01:37 2020
 """
 
 from dataset import MediaEval18
-from model import FCNet
 import numpy as np
 import torch
 from log import setup_custom_logger

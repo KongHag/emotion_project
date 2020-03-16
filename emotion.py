@@ -32,8 +32,8 @@ parser.add_argument("-O", "--optimizer", default="SGD",
                     choices=["Adam", "RMSprop", "SGD"], help="Type of optimizer")
 parser.add_argument("-C", "--crit", default="MSE",
                     choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
-parser.add_argument("-B", "--bidirect", default=False,
-                    type=bool, help="Whether to use bidirectional")
+# parser.add_argument("-B", "--bidirect", default=False,
+#                     type=bool, help="Whether to use bidirectional")
 # parser.add_argument("-R", "--regularisation",
 #                     choices=["L1", "L2"], help="Type of regularization (L1 or L2)")
 parser.add_argument("-D", "--dropout", default=0, type=float,

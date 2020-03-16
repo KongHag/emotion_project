@@ -11,24 +11,9 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 
-class FCNet(nn.Module):
-    def __init__(self):
-        super(FCNet, self).__init__()
-        self.dropout1 = nn.Dropout(0.4)
-        self.fc1 = nn.Linear(6950, 512)
-        self.dropout2 = nn.Dropout(0.4)
-        self.fc2 = nn.Linear(512, 2)
-
-    def forward(self, x):
-        x = self.dropout1(x)
-        x = F.relu(self.fc1(x))
-        x = self.dropout2(x)
-        x = self.fc2(x)
-        return x
-
-
 class RecurrentNet(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers, output_size, dropout=0, bidirectional=False):
+    def __init__(self, input_size, hidden_size, num_layers, output_size,
+                 dropout, bidirectional):
         super(RecurrentNet, self).__init__()
 
         self.num_layers = num_layers
@@ -51,7 +36,9 @@ class RecurrentNet(nn.Module):
 
     def initHelper(self, batch_size):
         # initialize hidden states to 0
-        hidden = Variable(torch.zeros(self.num_layers, batch_size, self.hidden_size))
-        cell = Variable(torch.zeros(self.num_layers, batch_size, self.hidden_size))
+        hidden = Variable(torch.zeros(
+            self.num_layers, batch_size, self.hidden_size))
+        cell = Variable(torch.zeros(
+            self.num_layers, batch_size, self.hidden_size))
 
         return hidden, cell
