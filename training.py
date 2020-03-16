@@ -45,8 +45,14 @@ def do_one_epoch(model, loader, train, criterion, device,
         gpu_Y = Y.to(device=device, dtype=torch.float32)
         logger.debug("X, Y copied on device {}".format(device))
 
+        # Init hidden layer input
+        hidden, cell = model.initHelper(gpu_X.shape[0])
+        gpu_hidden = hidden.to(device=device)
+        gpu_cell = cell.to(device=device)
+        logger.debug("hidden layer and cell initialized")
+
         # Output and loss computation
-        gpu_output = model(gpu_X)
+        gpu_output = model(gpu_X, (gpu_hidden, gpu_cell))
         logger.debug("output computed")
         loss = criterion(gpu_output, gpu_Y)
         logger.debug("loss computed : {}".format(float(loss)))
