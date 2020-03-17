@@ -26,7 +26,7 @@
 - [ ] Créer une fonction score, qui prend en entrée un modèle et qui renvoie son score, indépendament du criterion (Pearson ?), évalué sur le testset.
 - [ ] Créer un fichier type carnet d'essais, dans lequel on syntétisera tous les essais, résultats etc, même ceux qui n'ont pas marché.
 - [ ] Implémenter un scheduler.
-- [ ] Implémenter régularisation L2.
+- [x] Implémenter régularisation L2.
 - [ ] Implémenter le lstm bidirectionnel (buggé pour l'instant).
 - [ ] Ecrire une jolie docstring au début du fichier ```emotion.py```.
 - [ ] Ecrire une jolie docstring au début du fichier ```model.py```.
@@ -192,13 +192,13 @@ Pas encore utilisé
 Fonctionnement du argparser :
 
 ```bash
-emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
-                  [--hidden-dim HIDDEN_DIM] [--lr LR]
-                  [--input-size INPUT_SIZE] [--batch-size BATCH_SIZE]
-                  [--grad-clip GRAD_CLIP]
-                  [-S {StepLR,MultiStepLR,MultiplicativeLR}]
-                  [--nb_batch NB_BATCH] [-O {Adam,RMSprop}] [-C {MSE,Pearson}]
-                  [-B BIDIRECT] [-R {L1,L2}] [-D DROPOUT]
+usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
+                  [--hidden-size HIDDEN_SIZE] [--lr LR]
+                  [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
+                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}]
+                  [-C {MSE,Pearson}] [--weight-decay WEIGHT_DECAY]
+                  [-D DROPOUT] [--logger-level LOGGER_LEVEL]
+                  [--fragment FRAGMENT]
 
 Train Neural Network for emotion predictions
 
@@ -207,27 +207,25 @@ optional arguments:
   --seq-len SEQ_LEN     Length of a sequence
   --num-hidden NUM_HIDDEN
                         Number of hidden layers in NN
-  --hidden-dim HIDDEN_DIM
+  --hidden-size HIDDEN_SIZE
                         Dimension of hidden layer
   --lr LR               Learning rate
-  --input-size INPUT_SIZE
-                        Size of the input dataset
   --batch-size BATCH_SIZE
                         Size of a batch
   --grad-clip GRAD_CLIP
                         Boundaries of the gradient clipping function (centered
                         on 0)
-  -S {StepLR,MultiStepLR,MultiplicativeLR}, --scheduler {StepLR,MultiStepLR,MultiplicativeLR}
-                        Type of scheduler
-  --nb_batch NB_BATCH   Number of batches
-  -O {Adam,RMSprop}, --optimizer {Adam,RMSprop}
+  --nb-epoch NB_EPOCH   Number of epoch
+  -O {Adam,RMSprop,SGD}, --optimizer {Adam,RMSprop,SGD}
                         Type of optimizer
   -C {MSE,Pearson}, --crit {MSE,Pearson}
                         Typer of criterion for loss computation
-  -B BIDIRECT, --bidirect BIDIRECT
-                        Whether to use bidirectional
-  -R {L1,L2}, --regularisation {L1,L2}
-                        Type of regularization
+  --weight-decay WEIGHT_DECAY
+                        L2 regularizations coefficient
   -D DROPOUT, --dropout DROPOUT
                         Dropout probability between [0, 1]
+  --logger-level LOGGER_LEVEL
+                        Logger level: from 10 (debug) to 50 (critical)
+  --fragment FRAGMENT   The percentage of the dataset used. From 0 to 1
+quentingallouedec@MacBook-Pro-de-Quentin emotion_project % 
 ```

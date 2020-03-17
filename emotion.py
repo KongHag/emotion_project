@@ -27,7 +27,7 @@ parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate")
 parser.add_argument("--batch-size", default=128,
                     type=int, help="Size of a batch")
 parser.add_argument("--grad-clip", default=None, type=float,
-                    help="Boundaries of the gradient clipping function (centered on 0)")
+                    help="Gradient clipped between [- grad-clip, grad-clip]")
 # TODO : implement scheduler
 # parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
 parser.add_argument("--nb-epoch", default=100,
@@ -39,9 +39,8 @@ parser.add_argument("-C", "--crit", default="MSE",
 # TODO : implement bidirect
 # parser.add_argument("-B", "--bidirect", default=False,
 #                     type=bool, help="Whether to use bidirectional")
-# TODO : implement regularization
-# parser.add_argument("-R", "--regularisation",
-#                     choices=["L1", "L2"], help="Type of regularization (L1 or L2)")
+parser.add_argument("--weight-decay", default=0, type=float,
+                    help="L2 regularization coefficient")
 parser.add_argument("-D", "--dropout", default=0, type=float,
                     help="Dropout probability between [0, 1]")
 parser.add_argument("--logger-level", default=20, type=int,
@@ -59,7 +58,7 @@ def run(args):
     # Dataset initilisation
     trainset = MediaEval18(
         root='./data', train=True, seq_len=getattr(args, 'seq_len'),
-        shuffle=True, fragment=getattr(args, 'fragment'), features=['fc6'])
+        shuffle=True, fragment=getattr(args, 'fragment'), features=['all'])
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
         num_workers=8)
@@ -68,7 +67,7 @@ def run(args):
 
     testset = MediaEval18(
         root='./data', train=False, seq_len=getattr(args, 'seq_len'),
-        shuffle=True, fragment=getattr(args, 'fragment'), features=['fc6'])
+        shuffle=True, fragment=getattr(args, 'fragment'), features=['all'])
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=getattr(args, 'batch_size'),
         num_workers=8)
@@ -92,12 +91,16 @@ def run(args):
     # Define optimizer
     attr_optimizer = getattr(args, 'optimizer')
     lr = getattr(args, 'lr')
+    weight_decay = getattr(args, 'weight_decay')
     if attr_optimizer == 'Adam':
-        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        optimizer = torch.optim.Adam(
+            model.parameters(), lr=lr, weight_decay=weight_decay)
     if attr_optimizer == 'RMSprop':
-        optimizer = torch.optim.RMSprop(model.parameters(), lr=lr)
+        optimizer = torch.optim.RMSprop(
+            model.parameters(), lr=lr, weight_decay=weight_decay)
     if attr_optimizer == 'SGD':
-        optimizer = torch.optim.SGD(model.parameters(), lr=lr)
+        optimizer = torch.optim.SGD(
+            model.parameters(), lr=lr, weight_decay=weight_decay)
     logger.info("optimizer : {}".format(optimizer))
 
     # Train model
