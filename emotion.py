@@ -4,6 +4,8 @@ TODO : write a docstring
 """
 
 import sys
+import os
+import time
 import argparse
 import torch
 from dataset import MediaEval18
@@ -11,6 +13,7 @@ from model import RecurrentNet
 from training import train_model
 from log import setup_custom_logger
 import logging
+import json
 
 logger = setup_custom_logger("emotion")
 
@@ -104,13 +107,33 @@ def run(args):
     logger.info("optimizer : {}".format(optimizer))
 
     # Train model
-    train_model(model=model,
-                trainloader=trainloader, testloader=testloader,
-                criterion=criterion,
-                optimizer=optimizer,
-                device=device,
-                grad_clip=getattr(args, 'grad_clip'),
-                nb_epoch=getattr(args, 'nb_epoch'))
+    train_losses, test_losses = train_model(
+        model=model, trainloader=trainloader, testloader=testloader,
+        criterion=criterion, optimizer=optimizer, device=device,
+        grad_clip=getattr(args, 'grad_clip'),
+        nb_epoch=getattr(args, 'nb_epoch'))
+
+    return train_losses, test_losses
+
+
+def save_config_and_results(config, train_losses, test_losses):
+    """Save in a file in results/ the config and the results"""
+    results = {
+        'train_losses': train_losses,
+        'test_losses': test_losses
+    }
+
+    config_and_results = {**config, **results}
+
+    if not os.path.exists('results'):
+        os.makedirs('results')
+
+    file_name = "results/emotion_" + \
+        time.strftime("%Y-%m-%d_%H:%M:%S") + ".json"
+
+    # Save the config and the results
+    with open(file_name, 'w') as file:
+        json.dump(config_and_results, file)
 
 
 # Parse args
@@ -123,7 +146,10 @@ for arg in vars(args):
         "initialization -- {} - {}".format(arg, getattr(args, arg)))
 
 try:
-    run(args)
+    config = vars(args)
+    train_losses, test_losses = run(args)
+    save_config_and_results(config, train_losses, test_losses)
+
 except Exception as exception:
     logger.critical(sys.exc_info())
 finally:

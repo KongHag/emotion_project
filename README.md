@@ -227,5 +227,5 @@ optional arguments:
   --logger-level LOGGER_LEVEL
                         Logger level: from 10 (debug) to 50 (critical)
   --fragment FRAGMENT   The percentage of the dataset used. From 0 to 1
-quentingallouedec@MacBook-Pro-de-Quentin emotion_project % 
+quentingallouedec@MacBook-Pro-de-Quentin emotion_project %
 ```

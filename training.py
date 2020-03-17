@@ -78,6 +78,7 @@ def train_model(model, trainloader, testloader, criterion, optimizer, device,
     """Run this function to train the model"""
 
     logger.info("start training network")
+    train_losses, test_losses = [], []
 
     for epoch in range(nb_epoch):
         logger.info("Starting training epoch {}".format(epoch))
@@ -86,14 +87,17 @@ def train_model(model, trainloader, testloader, criterion, optimizer, device,
         test_loss = do_one_epoch(model=model, loader=testloader, train=False,
                                  criterion=criterion, device=device,
                                  grad_clip=grad_clip)
+        logger.info(f"Test  loss : {test_loss : 3f}")
+        test_losses.append(test_loss)
 
         # Train the model
         train_loss = do_one_epoch(model=model, loader=trainloader, train=True,
                                   criterion=criterion, device=device,
                                   optimizer=optimizer, grad_clip=grad_clip)
-
-        logger.info(f"Test  loss : {test_loss : 3f}")
         logger.info(f"Train loss : {train_loss : 3f}")
+        train_losses.append(train_loss)
+
+    return train_losses, test_losses
 
 
 if __name__ == '__main__':

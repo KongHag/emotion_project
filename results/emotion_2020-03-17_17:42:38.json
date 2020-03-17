@@ -1,0 +1,1 @@
+{"seq_len": 20, "num_hidden": 1, "hidden_size": 32, "lr": 0.001, "batch_size": 128, "grad_clip": null, "nb_epoch": 2, "optimizer": "SGD", "crit": "MSE", "weight_decay": 1e-05, "dropout": 0, "logger_level": 20, "fragment": 0.01, "last_epoch_test_loss": 0.1683031221230825}
