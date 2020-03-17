@@ -24,7 +24,8 @@
 
 - [ ] Etoffer et mettre à jour le ```README.md```.
 - [ ] Créer une fonction score, qui prend en entrée un modèle et qui renvoie son score, indépendament du criterion (Pearson ?), évalué sur le testset.
-- [ ] Créer un fichier type carnet d'essais, dans lequel on syntétisera tous les essais, résultats etc, même ceux qui n'ont pas marché.
+- [x] Création d'un dossier ```results``` dans lequel est stocké un historique des configuration et les résultats obtenus
+- [ ] Fonction qui lit les fichier du dossier ```results```et met en forme les résultats obtenus.
 - [ ] Implémenter un scheduler.
 - [x] Implémenter régularisation L2.
 - [ ] Implémenter le lstm bidirectionnel (buggé pour l'instant).
@@ -191,8 +192,7 @@ Pas encore utilisé
 
 Fonctionnement du argparser :
 
-```bash
-usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
+```usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
                   [--hidden-size HIDDEN_SIZE] [--lr LR]
                   [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
                   [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}]
@@ -227,5 +227,4 @@ optional arguments:
   --logger-level LOGGER_LEVEL
                         Logger level: from 10 (debug) to 50 (critical)
   --fragment FRAGMENT   The percentage of the dataset used. From 0 to 1
-quentingallouedec@MacBook-Pro-de-Quentin emotion_project %
 ```
