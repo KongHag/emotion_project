@@ -1,4 +1,7 @@
-#!/opt/pytorch/1.0.0/venv/bin/python
+# -*- coding: utf-8 -*-
+"""
+TODO : write a docstring
+"""
 
 import sys
 import argparse
@@ -25,6 +28,7 @@ parser.add_argument("--batch-size", default=128,
                     type=int, help="Size of a batch")
 parser.add_argument("--grad-clip", default=None, type=float,
                     help="Boundaries of the gradient clipping function (centered on 0)")
+# TODO : implement scheduler
 # parser.add_argument("-S", "--scheduler", default="StepLR", choices=["StepLR", "MultiStepLR", "MultiplicativeLR"], help="Type of scheduler")
 parser.add_argument("--nb-epoch", default=100,
                     type=int, help="Number of epoch")
@@ -32,8 +36,10 @@ parser.add_argument("-O", "--optimizer", default="SGD",
                     choices=["Adam", "RMSprop", "SGD"], help="Type of optimizer")
 parser.add_argument("-C", "--crit", default="MSE",
                     choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
+# TODO : implement bidirect
 # parser.add_argument("-B", "--bidirect", default=False,
 #                     type=bool, help="Whether to use bidirectional")
+# TODO : implement regularization
 # parser.add_argument("-R", "--regularisation",
 #                     choices=["L1", "L2"], help="Type of regularization (L1 or L2)")
 parser.add_argument("-D", "--dropout", default=0, type=float,
@@ -57,6 +63,9 @@ def run(args):
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
         num_workers=8)
+    logger.info(
+        "trainset/loader initialized : trainset lenght : {}".format(len(trainset)))
+
     testset = MediaEval18(
         root='./data', train=False, seq_len=getattr(args, 'seq_len'),
         shuffle=True, fragment=getattr(args, 'fragment'), features=['fc6'])
@@ -64,7 +73,7 @@ def run(args):
         testset, batch_size=getattr(args, 'batch_size'),
         num_workers=8)
     logger.info(
-        "dataset/dataloader initialized : train set lenght : {}  test set leght : {}".format(len(trainset), len(testset)))
+        "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
     model = RecurrentNet(input_size=next(iter(trainset))[0].shape[1],

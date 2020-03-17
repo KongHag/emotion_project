@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb  6 10:46:42 2020
-
-@author: Tim
+TODO : write a doctring
 """
 
 import torch

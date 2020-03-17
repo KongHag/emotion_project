@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan  2 16:07:58 2020
-
-@author: Tim
+TODO : write a docstring
 """
 
 import logging
 import time
 import os
 
-
-# handler = logging.StreamHandler()
-# handler.setFormatter(formatter)
-# logger.addHandler(handler)
 
 def setup_custom_logger(name):
     formatter = logging.Formatter(
@@ -26,7 +20,7 @@ def setup_custom_logger(name):
     fh = logging.FileHandler(log_file_name, mode="w")
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
-    
+
     logger = logging.getLogger()
     logger.addHandler(fh)
 

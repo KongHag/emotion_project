@@ -15,7 +15,6 @@ Size of the batch 1 : torch.Size([128, 20, 5367])
 Size of the batch 2 : torch.Size([128, 20, 5367])
 Size of the batch 3 : torch.Size([128, 20, 5367])
 ...
-
 """
 
 import torch
@@ -26,6 +25,7 @@ from torch.utils.data import Dataset, DataLoader
 from log import setup_custom_logger
 
 logger = setup_custom_logger("dataset")
+
 
 class MediaEval18(Dataset):
     """Mediaeval dataset
@@ -52,8 +52,6 @@ class MediaEval18(Dataset):
         "all": range(0, 6950)
     }
 
-
-
     def __init__(self, root='./data', train=True, seq_len=100, shuffle=False,
                  fragment=1, features=['all']):
         self.root = root
@@ -63,7 +61,7 @@ class MediaEval18(Dataset):
         self.features = features
 
         all_X, all_Y = load_data()
-        start_test=50
+        start_test = 50
         if self.train:
             self.data = all_X[:start_test], all_Y[:start_test]
         else:
@@ -73,7 +71,7 @@ class MediaEval18(Dataset):
         if self.shuffle:
             np.random.shuffle(self._possible_starts)
 
-        nb_sequences=int(len(self._possible_starts)*fragment)
+        nb_sequences = int(len(self._possible_starts)*fragment)
         self._possible_starts = self._possible_starts[:nb_sequences]
 
     def _compute_possible_starts(self):
@@ -98,7 +96,7 @@ class MediaEval18(Dataset):
         for feature_name, idxs in self._features_len.items():
             if feature_name in self.features:
                 all_idxs = np.union1d(all_idxs, idxs)
-        return X[:,all_idxs]
+        return X[:, all_idxs]
 
     def get_window(self, movie_id, seq_len, start_idx):
         """From a movie_id, returns a sequence of seq_len seconds, starting
@@ -115,7 +113,6 @@ class MediaEval18(Dataset):
         return (movie_features[start_idx:start_idx+seq_len, :],
                 movie_VA[start_idx:start_idx+seq_len, :])
 
-
     def __len__(self):
         return len(self._possible_starts)
 
@@ -126,6 +123,7 @@ class MediaEval18(Dataset):
                                start_idx=start["start_idx"])
         X = self._select_features(X)
         return X.astype("float32"), Y.astype("float32")
+
 
 if __name__ == "__main__":
     trainset = MediaEval18(root='./data', train=True, seq_len=20,

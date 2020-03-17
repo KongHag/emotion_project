@@ -5,9 +5,9 @@
 To load the data :
     // Having the file data/x_train.pickle and data/y_train.pickle
     from read_data import load_data
-    x_train, y_train = load_data()
+    X, Y = load_data()
 
-Erreurs trouvées dans les données:
+Errors found in the data:
     Movie 6 :
         audio feature for frame 5588 is missing
 
@@ -213,11 +213,11 @@ def dump_data():
         X = all_features(movie_id)
 
         logger.info(' '.join(("FEATURES\tmovie :", movie_id,
-              "\tArray shape :", X.shape)))
+                              "\tArray shape :", X.shape)))
 
         Y = valence_arousal(movie_id)
         logger.info(' '.join(("OUTPUT\tmovie :", movie_id,
-                    "\tArray shape :", Y.shape)))
+                              "\tArray shape :", Y.shape)))
 
         XX.append(X)
         YY.append(Y)
