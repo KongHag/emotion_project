@@ -150,7 +150,7 @@ Avec
 - ```SET_NAME``` : le nom du set (```DevSet-Part1```, ```DevSet-Part2```, ```DevSet-Part3``` ou ```TestSet```).
 - ```MOVIE_ID``` : id du film, sur 2 caractères, de 0 à 65.
 - ```IMAGE_ID``` : id du la frame, sur 5 caractères.
-- ```FEATURE ``` : nom abrégé du descripteur (```acc```, ```cedd```, ```cl```, ```eh```, ```fcth```, ```gabor```, ```icd```, ```sc```, ```tamura```, ```lbp``` ou ```fc6```).
+- ```FEATURE``` : nom abrégé du descripteur (```acc```, ```cedd```, ```cl```, ```eh```, ```fcth```, ```gabor```, ```icd```, ```sc```, ```tamura```, ```lbp``` ou ```fc6```).
 
 Le fichier contient une liste de valeurs décimales séparées par une ```,``` dont la taille dépend du descripteur.
 
@@ -166,16 +166,16 @@ valence_arousal = read_data.valence_arousal(12)
 ```
 
 Pour chaque seconde, une valeur de valence et d'arousal sont stockées dans un fichier ```.txt```.
-Le path est : 
+Le path est :
 
-```
-MEDIAEVAL18-{SET_NAME}-Valence-Arousal/annotation/MEDIAEVAL18_{MOVIE_ID}_Valence-Arousal.txt
-```
-Avec 
-+ ```SET_NAME``` : le nom du set (```DevSet-Part1```, ```DevSet-Part2```, ```DevSet-Part3``` ou ```TestSet```).
-+ ```MOVIE_ID``` : id du film, sur 2 caractères, de 0 à 65.
+```MEDIAEVAL18-{SET_NAME}-Valence-Arousal/annotation/MEDIAEVAL18_{MOVIE_ID}_Valence-Arousal.txt```
 
-Le fichier contient une liste de valeurs décimales séparées par une ```,``` . Les colonnes sont dans l'ordre le temps, la valence et l'arousal
+Avec
+
+- ```SET_NAME``` : le nom du set (```DevSet-Part1```, ```DevSet-Part2```, ```DevSet-Part3``` ou ```TestSet```).
+- ```MOVIE_ID``` : id du film, sur 2 caractères, de 0 à 65.
+
+Le fichier contient une liste de valeurs décimales séparées par une ```,``` . Les colonnes sont dans l'ordre : le temps, la valence et l'arousal.
 
 ### Fear annotation
 

@@ -81,7 +81,7 @@ def run(args):
                          num_layers=getattr(args, 'num_hidden'),
                          output_size=2,
                          dropout=getattr(args, 'dropout'),
-                         bidirectional=getattr(args, 'bidirect'))
+                         bidirectional=False)
     model.to(device)
     logger.info("model : {}".format(model))
 
