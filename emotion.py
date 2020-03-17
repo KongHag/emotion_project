@@ -9,6 +9,7 @@ import time
 import argparse
 import torch
 from dataset import MediaEval18
+from torch.utils.data import DataLoader
 from model import RecurrentNet
 from training import train_model
 from log import setup_custom_logger
@@ -62,18 +63,16 @@ def run(args):
     trainset = MediaEval18(
         root='./data', train=True, seq_len=getattr(args, 'seq_len'),
         shuffle=True, fragment=getattr(args, 'fragment'), features=['all'])
-    trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=getattr(args, 'batch_size'), shuffle=True,
-        num_workers=8)
+    trainloader = DataLoader(trainset, batch_size=getattr(args, 'batch_size'),
+        shuffle=True, num_workers=8)
     logger.info(
         "trainset/loader initialized : trainset lenght : {}".format(len(trainset)))
 
     testset = MediaEval18(
         root='./data', train=False, seq_len=getattr(args, 'seq_len'),
         shuffle=True, fragment=getattr(args, 'fragment'), features=['all'])
-    testloader = torch.utils.data.DataLoader(
-        testset, batch_size=getattr(args, 'batch_size'),
-        num_workers=8)
+    testloader = DataLoader(testset, batch_size=getattr(args, 'batch_size'),
+                            num_workers=8)
     logger.info(
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 

@@ -3,12 +3,9 @@
 TODO : write a doctring
 """
 
-from dataset import MediaEval18
 import numpy as np
 import torch
 from log import setup_custom_logger
-import pickle
-import os
 
 logger = setup_custom_logger('Model training')
 
@@ -102,6 +99,10 @@ def train_model(model, trainloader, testloader, criterion, optimizer, device,
 
 if __name__ == '__main__':
     import logging
+    from dataset import MediaEval18
+    from torch.utils.data import DataLoader
+    from model import RecurrentNet
+
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
@@ -109,18 +110,24 @@ if __name__ == '__main__':
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
     # Define sets then loaders
-    trainset = MediaEval18(root='./data', train=True, fragment=0.3, shuffle=True,
-                           features=["all"])
-    trainloader = torch.utils.data.DataLoader(
+    trainset = MediaEval18(root='./data', train=True, fragment=0.3,
+                           shuffle=True, features=["all"])
+    trainloader = DataLoader(
         trainset, batch_size=4, shuffle=True)
 
-    testset = MediaEval18(root='./data', train=False, fragment=0.3, shuffle=True,
-                          features=["all"])
-    testloader = torch.utils.data.DataLoader(
+    testset = MediaEval18(root='./data', train=False, fragment=0.3,
+                          shuffle=True, features=["all"])
+    testloader = DataLoader(
         testset, batch_size=4, shuffle=True)
 
     # Define the model
-    model = FCNet()
+    model = RecurrentNet(input_size=next(iter(trainset))[0].shape[1],
+                         hidden_size=32,
+                         num_layers=1,
+                         output_size=2,
+                         dropout=0,
+                         bidirectional=False)
+
     logger.info("neural network : {}".format(model))
 
     # Define optimizer

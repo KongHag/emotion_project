@@ -192,7 +192,8 @@ Pas encore utilisé
 
 Fonctionnement du argparser :
 
-```usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
+```
+usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
                   [--hidden-size HIDDEN_SIZE] [--lr LR]
                   [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
                   [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}]

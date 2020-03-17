@@ -18,10 +18,9 @@ Size of the batch 3 : torch.Size([128, 20, 5367])
 """
 
 import torch
-import torch.nn as nn
 import numpy as np
 from read_data import load_data
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from log import setup_custom_logger
 
 logger = setup_custom_logger("dataset")
@@ -126,9 +125,10 @@ class MediaEval18(Dataset):
 
 
 if __name__ == "__main__":
+    from torch.utils.data import DataLoader
     trainset = MediaEval18(root='./data', train=True, seq_len=20,
                            features=['visual'], fragment=0.05)
-    trainloader = torch.utils.data.DataLoader(
+    trainloader = DataLoader(
         trainset, batch_size=128, shuffle=True)
 
     for i, data in enumerate(trainloader):
