@@ -1,5 +1,51 @@
 # Projet 3A : Détection d'émotions dans des séquences de films
 
+## Lancer un entrainement
+
+## Fonctionnement des scripts
+
+Executer le script ```emotion.py```.
+
+```
+usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
+                  [--hidden-size HIDDEN_SIZE] [--lr LR]
+                  [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
+                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}]
+                  [-C {MSE,Pearson}] [--weight-decay WEIGHT_DECAY]
+                  [-D DROPOUT] [--logger-level LOGGER_LEVEL]
+                  [--fragment FRAGMENT]
+
+Train Neural Network for emotion predictions
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --seq-len SEQ_LEN     Length of a sequence
+  --num-hidden NUM_HIDDEN
+                        Number of hidden layers in NN
+  --hidden-size HIDDEN_SIZE
+                        Dimension of hidden layer
+  --lr LR               Learning rate
+  --batch-size BATCH_SIZE
+                        Size of a batch
+  --grad-clip GRAD_CLIP
+                        Boundaries of the gradient clipping function (centered
+                        on 0)
+  --nb-epoch NB_EPOCH   Number of epoch
+  -O {Adam,RMSprop,SGD}, --optimizer {Adam,RMSprop,SGD}
+                        Type of optimizer
+  -C {MSE,Pearson}, --crit {MSE,Pearson}
+                        Typer of criterion for loss computation
+  --weight-decay WEIGHT_DECAY
+                        L2 regularizations coefficient
+  -D DROPOUT, --dropout DROPOUT
+                        Dropout probability between [0, 1]
+  --logger-level LOGGER_LEVEL
+                        Logger level: from 10 (debug) to 50 (critical)
+  --fragment FRAGMENT   The percentage of the dataset used. From 0 to 1
+```
+
+La configuration choisie, ainsi que les résultats seront stockés dans le dossier ```results``` sous le format ```json```.
+
 ## Tâches
 
 ### Séance du 23/01/2020
@@ -186,46 +232,3 @@ Pas encore utilisé
 
 Pas encore utilisé
 
---------------------
-
-## Fonctionnement des scripts
-
-Fonctionnement du argparser :
-
-```
-usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
-                  [--hidden-size HIDDEN_SIZE] [--lr LR]
-                  [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
-                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}]
-                  [-C {MSE,Pearson}] [--weight-decay WEIGHT_DECAY]
-                  [-D DROPOUT] [--logger-level LOGGER_LEVEL]
-                  [--fragment FRAGMENT]
-
-Train Neural Network for emotion predictions
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --seq-len SEQ_LEN     Length of a sequence
-  --num-hidden NUM_HIDDEN
-                        Number of hidden layers in NN
-  --hidden-size HIDDEN_SIZE
-                        Dimension of hidden layer
-  --lr LR               Learning rate
-  --batch-size BATCH_SIZE
-                        Size of a batch
-  --grad-clip GRAD_CLIP
-                        Boundaries of the gradient clipping function (centered
-                        on 0)
-  --nb-epoch NB_EPOCH   Number of epoch
-  -O {Adam,RMSprop,SGD}, --optimizer {Adam,RMSprop,SGD}
-                        Type of optimizer
-  -C {MSE,Pearson}, --crit {MSE,Pearson}
-                        Typer of criterion for loss computation
-  --weight-decay WEIGHT_DECAY
-                        L2 regularizations coefficient
-  -D DROPOUT, --dropout DROPOUT
-                        Dropout probability between [0, 1]
-  --logger-level LOGGER_LEVEL
-                        Logger level: from 10 (debug) to 50 (critical)
-  --fragment FRAGMENT   The percentage of the dataset used. From 0 to 1
-```
