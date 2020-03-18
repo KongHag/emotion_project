@@ -2,9 +2,7 @@
 
 ## Lancer un entrainement
 
-## Fonctionnement des scripts
-
-Executer le script ```emotion.py```.
+Pour lancer un entrainement, il faut executer le script ```emotion.py```.
 
 ```
 usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
