@@ -69,7 +69,7 @@ La configuration choisie, ainsi que les résultats seront stockés dans le dossi
 - [ ] Etoffer et mettre à jour le ```README.md```.
 - [ ] Créer une fonction score, qui prend en entrée un modèle et qui renvoie son score, indépendament du criterion (Pearson ?), évalué sur le testset.
 - [x] Création d'un dossier ```results``` dans lequel est stocké un historique des configuration et les résultats obtenus
-- [ ] Fonction qui lit les fichier du dossier ```results```et met en forme les résultats obtenus.
+- [x] Fonction qui lit les fichier du dossier ```results```et met en forme les résultats obtenus.
 - [ ] Implémenter un scheduler.
 - [x] Implémenter régularisation L2.
 - [ ] Implémenter le lstm bidirectionnel (buggé pour l'instant).
