@@ -15,7 +15,7 @@ config = {
     'weight_decay': 0,
     'dropout': 0,
     'logger_level': 20,
-    'fragment': 0.001
+    'fragment': 1
 }
 
 # Parse args
