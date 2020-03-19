@@ -23,12 +23,12 @@ logger = logging.getLogger()
 logger.setLevel(config['logger_level'])
 
 
-seq_lens = [2**5, 2**6, 2**7, 2**8, 2**9]
-num_hiddens = [1, 2, 3, 4, 5]
-weight_decays = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
-dropouts = [0.1, 0.2, 0.3, 0.4, 0.5]
-grad_clips = [None, 1e4, 1e3, 1e2, 1e1, 1e0]
-hidden_sizes = [2**6, 2**7, 2**8, 2**9, 2**10, 2**11, 2**12]
+seq_lens = [2**5, 2**7, 2**9]
+num_hiddens = [2, 4, 6]
+weight_decays = [1e-2, 1e-4, 1e-6]
+dropouts = [0.1, 0.3, 0.5]
+grad_clips = [1e2, 1e1, 1e0]
+hidden_sizes = [2**6, 2**8, 2**10]
 
 for seq_len in seq_lens:
     config['seq_len'] = seq_len
@@ -42,8 +42,6 @@ for seq_len in seq_lens:
                     config['grad_clip'] = grad_clip
                     for hidden_size in hidden_sizes:
                         config['hidden_size'] = hidden_size
-
-                        print(config)
 
                         for arg_name, arg in config.items():
                             logger.info(
