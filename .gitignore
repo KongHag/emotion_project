@@ -9,7 +9,7 @@ data/
 models*
 
 # results stored locally
-results*
+# results*
 
 # file created with macOS
 .DS_Store
