@@ -39,7 +39,7 @@ parser.add_argument("--nb-epoch", default=100,
 parser.add_argument("-O", "--optimizer", default="SGD",
                     choices=["Adam", "RMSprop", "SGD"], help="Type of optimizer")
 parser.add_argument("-C", "--crit", default="MSE",
-                    choices=["MSE", "Pearson"], help="Typer of criterion for loss computation")
+                    choices=["MSE", "Pearson"], help="Type of criterion for loss computation")
 # TODO : implement bidirect
 # parser.add_argument("-B", "--bidirect", default=False,
 #                     type=bool, help="Whether to use bidirectional")
@@ -53,7 +53,7 @@ parser.add_argument("--fragment", default=1, type=float,
                     help="The percentage of the dataset used. From 0 to 1")
 
 
-def run(args):
+def run(config):
     # Select device
     device = torch.device(
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
@@ -61,27 +61,27 @@ def run(args):
 
     # Dataset initilisation
     trainset = MediaEval18(
-        root='./data', train=True, seq_len=getattr(args, 'seq_len'),
-        shuffle=True, fragment=getattr(args, 'fragment'), features=['all'])
-    trainloader = DataLoader(trainset, batch_size=getattr(args, 'batch_size'),
+        root='./data', train=True, seq_len=config['seq_len'],
+        shuffle=True, fragment=config['fragment'], features=['all'])
+    trainloader = DataLoader(trainset, batch_size=config['batch_size'],
         shuffle=True, num_workers=8)
     logger.info(
         "trainset/loader initialized : trainset lenght : {}".format(len(trainset)))
 
     testset = MediaEval18(
-        root='./data', train=False, seq_len=getattr(args, 'seq_len'),
-        shuffle=True, fragment=getattr(args, 'fragment'), features=['all'])
-    testloader = DataLoader(testset, batch_size=getattr(args, 'batch_size'),
+        root='./data', train=False, seq_len=config['seq_len'],
+        shuffle=True, fragment=config['fragment'], features=['all'])
+    testloader = DataLoader(testset, batch_size=config['batch_size'],
                             num_workers=8)
     logger.info(
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
     model = RecurrentNet(input_size=next(iter(trainset))[0].shape[1],
-                         hidden_size=getattr(args, 'hidden_size'),
-                         num_layers=getattr(args, 'num_hidden'),
+                         hidden_size=config['hidden_size'],
+                         num_layers=config['num_hidden'],
                          output_size=2,
-                         dropout=getattr(args, 'dropout'),
+                         dropout=config['dropout'],
                          bidirectional=False)
     model.to(device)
     logger.info("model : {}".format(model))
@@ -91,9 +91,9 @@ def run(args):
     logger.info("criterion : {}".format(criterion))
 
     # Define optimizer
-    attr_optimizer = getattr(args, 'optimizer')
-    lr = getattr(args, 'lr')
-    weight_decay = getattr(args, 'weight_decay')
+    attr_optimizer = config['optimizer']
+    lr = config['lr']
+    weight_decay = config['weight_decay']
     if attr_optimizer == 'Adam':
         optimizer = torch.optim.Adam(
             model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -109,8 +109,8 @@ def run(args):
     train_losses, test_losses = train_model(
         model=model, trainloader=trainloader, testloader=testloader,
         criterion=criterion, optimizer=optimizer, device=device,
-        grad_clip=getattr(args, 'grad_clip'),
-        nb_epoch=getattr(args, 'nb_epoch'))
+        grad_clip=config['grad_clip'],
+        nb_epoch=config['nb_epoch'])
 
     return train_losses, test_losses
 
@@ -136,17 +136,16 @@ def save_config_and_results(config, train_losses, test_losses):
 
 
 # Parse args
-args = parser.parse_args()
+config = vars(parser.parse_args())
 logger = logging.getLogger()
-logger.setLevel(getattr(args, 'logger_level'))
+logger.setLevel(config['logger_level'])
 
-for arg in vars(args):
+for arg_name, arg in config.items():
     logger.info(
-        "initialization -- {} - {}".format(arg, getattr(args, arg)))
+        "initialization -- {} - {}".format(arg_name, arg))
 
 try:
-    config = vars(args)
-    train_losses, test_losses = run(args)
+    train_losses, test_losses = run(config)
     save_config_and_results(config, train_losses, test_losses)
 
 except Exception as exception:
