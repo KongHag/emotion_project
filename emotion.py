@@ -134,22 +134,22 @@ def save_config_and_results(config, train_losses, test_losses):
     with open(file_name, 'w') as file:
         json.dump(config_and_results, file)
 
+if __name__=='__main__':
+    # Parse args
+    config = vars(parser.parse_args())
+    logger = logging.getLogger()
+    logger.setLevel(config['logger_level'])
 
-# Parse args
-config = vars(parser.parse_args())
-logger = logging.getLogger()
-logger.setLevel(config['logger_level'])
+    for arg_name, arg in config.items():
+        logger.info(
+            "initialization -- {} - {}".format(arg_name, arg))
 
-for arg_name, arg in config.items():
-    logger.info(
-        "initialization -- {} - {}".format(arg_name, arg))
+    try:
+        train_losses, test_losses = run(config)
+        save_config_and_results(config, train_losses, test_losses)
 
-try:
-    train_losses, test_losses = run(config)
-    save_config_and_results(config, train_losses, test_losses)
-
-except Exception as exception:
-    logger.critical(sys.exc_info())
-finally:
-    # exit
-    sys.exit(0)
+    except Exception as exception:
+        logger.critical(sys.exc_info())
+    finally:
+        # exit
+        sys.exit(0)
