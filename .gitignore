@@ -1,3 +1,7 @@
+# training results
+results/*.json
+results/*.out
+
 # our data
 data/
 
