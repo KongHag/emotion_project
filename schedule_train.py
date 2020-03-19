@@ -43,6 +43,8 @@ for seq_len in seq_lens:
                     for hidden_size in hidden_sizes:
                         config['hidden_size'] = hidden_size
 
+                        print(config)
+
                         for arg_name, arg in config.items():
                             logger.info(
                                 "initialization -- {} - {}".format(arg_name, arg))
@@ -54,6 +56,3 @@ for seq_len in seq_lens:
 
                         except Exception as exception:
                             logger.critical(sys.exc_info())
-                        finally:
-                            # exit
-                            sys.exit(0)
