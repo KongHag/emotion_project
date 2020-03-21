@@ -8,10 +8,11 @@ Pour lancer un entrainement, il faut executer le script ```emotion.py```.
 usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
                   [--hidden-size HIDDEN_SIZE] [--lr LR]
                   [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
-                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}]
-                  [-C {MSE,Pearson}] [--weight-decay WEIGHT_DECAY]
-                  [-D DROPOUT] [--logger-level LOGGER_LEVEL]
-                  [--fragment FRAGMENT]
+                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
+                  [--weight-decay WEIGHT_DECAY] [-D DROPOUT]
+                  [--logger-level LOGGER_LEVEL] [--fragment FRAGMENT]
+                  [--features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} [{acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} ...]]
+                  [--no-overlapping]
 
 Train Neural Network for emotion predictions
 
@@ -39,8 +40,9 @@ optional arguments:
   --logger-level LOGGER_LEVEL
                         Logger level: from 10 (debug) to 50 (critical)
   --fragment FRAGMENT   The percentage of the dataset used. From 0 to 1
-  --features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all}
+  --features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} [{acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} ...]
                         Features used
+  --no-overlapping      Forbid overlapping between sequences in dataset
 ```
 
 La configuration choisie, ainsi que les résultats seront stockés dans le dossier ```results``` sous le format ```json```.

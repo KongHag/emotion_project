@@ -54,6 +54,9 @@ parser.add_argument("--fragment", default=1, type=float,
                     help="The percentage of the dataset used. From 0 to 1")
 parser.add_argument("--features", default="all", nargs='+',
                     choices=features, help="Features used")
+parser.add_argument('--no-overlapping', dest='overlapping', action='store_false',
+                    help='Forbid overlapping between sequences in dataset')
+parser.set_defaults(overlapping=True)
 
 
 def run(config):
@@ -65,7 +68,7 @@ def run(config):
     # Dataset initilisation
     trainset = MediaEval18(
         root='./data', train=True, seq_len=config['seq_len'],
-        shuffle=True, fragment=config['fragment'], features=config['features'])
+        shuffle=True, fragment=config['fragment'], features=config['features'], overlapping=config['overlapping'])
     trainloader = DataLoader(trainset, batch_size=config['batch_size'],
                              shuffle=True, num_workers=8)
     logger.info(
@@ -73,7 +76,7 @@ def run(config):
 
     testset = MediaEval18(
         root='./data', train=False, seq_len=config['seq_len'],
-        shuffle=True, fragment=config['fragment'], features=config['features'])
+        shuffle=True, fragment=config['fragment'], features=config['features'], overlapping=config['overlapping'])
     testloader = DataLoader(testset, batch_size=config['batch_size'],
                             num_workers=8)
     logger.info(
@@ -147,7 +150,7 @@ if __name__ == '__main__':
     for arg_name, arg in config.items():
         logger.info(
             "initialization -- {} - {}".format(arg_name, arg))
-    sys.exit(0)
+
     try:
         train_losses, test_losses = run(config)
         save_config_and_results(config, train_losses, test_losses)
