@@ -59,7 +59,7 @@ La configuration choisie, ainsi que les résultats seront stockés dans le dossi
 - [x] Terminer les fonction de lecture des données
 - [x] Lecture de doc torch sur les couches RNN
 - [x] Premier pipe
-- [ ] Premier entraînement
+- [x] Premier entraînement
   
 ### Séance 06/02/2020
 
