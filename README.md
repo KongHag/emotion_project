@@ -26,20 +26,21 @@ optional arguments:
   --batch-size BATCH_SIZE
                         Size of a batch
   --grad-clip GRAD_CLIP
-                        Boundaries of the gradient clipping function (centered
-                        on 0)
+                        Gradient clipped between [- grad-clip, grad-clip]
   --nb-epoch NB_EPOCH   Number of epoch
   -O {Adam,RMSprop,SGD}, --optimizer {Adam,RMSprop,SGD}
                         Type of optimizer
-  -C {MSE,Pearson}, --crit {MSE,Pearson}
-                        Typer of criterion for loss computation
+  -B BIDIRECT, --bidirect BIDIRECT
+                        Whether to use bidirectional
   --weight-decay WEIGHT_DECAY
-                        L2 regularizations coefficient
+                        L2 regularization coefficient
   -D DROPOUT, --dropout DROPOUT
                         Dropout probability between [0, 1]
   --logger-level LOGGER_LEVEL
                         Logger level: from 10 (debug) to 50 (critical)
   --fragment FRAGMENT   The percentage of the dataset used. From 0 to 1
+  --features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all}
+                        Features used
 ```
 
 La configuration choisie, ainsi que les résultats seront stockés dans le dossier ```results``` sous le format ```json```.
@@ -72,7 +73,7 @@ La configuration choisie, ainsi que les résultats seront stockés dans le dossi
 - [x] Fonction qui lit les fichier du dossier ```results```et met en forme les résultats obtenus.
 - [ ] Implémenter un scheduler.
 - [x] Implémenter régularisation L2.
-- [ ] Implémenter le lstm bidirectionnel (buggé pour l'instant).
+- [x] Implémenter le lstm bidirectionnel (buggé pour l'instant).
 - [ ] Ecrire une jolie docstring au début du fichier ```emotion.py```.
 - [ ] Ecrire une jolie docstring au début du fichier ```model.py```.
 - [ ] Ecrire une jolie docstring au début du fichier ```log.py```.

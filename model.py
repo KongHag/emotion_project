@@ -15,6 +15,8 @@ class RecurrentNet(nn.Module):
 
         self.num_layers = num_layers
         self.hidden_size = hidden_size
+        self.bidirectional = bidirectional
+        self.coef = 2 if self.bidirectional else 1
 
         self.lstm_layer = nn.LSTM(input_size=input_size,
                                   hidden_size=hidden_size,
@@ -22,8 +24,8 @@ class RecurrentNet(nn.Module):
                                   bias=True,
                                   batch_first=True,
                                   dropout=dropout,
-                                  bidirectional=bidirectional)
-        self.out_layer = nn.Linear(self.hidden_size, output_size, bias=True)
+                                  bidirectional=self.bidirectional)
+        self.out_layer = nn.Linear(self.coef*self.hidden_size, output_size, bias=True)
 
     def forward(self, X, hidden):
         X, hidden = self.lstm_layer(X, hidden)
@@ -34,8 +36,8 @@ class RecurrentNet(nn.Module):
     def initHelper(self, batch_size):
         # initialize hidden states to 0
         hidden = Variable(torch.zeros(
-            self.num_layers, batch_size, self.hidden_size))
+            self.coef*self.num_layers, batch_size, self.hidden_size))
         cell = Variable(torch.zeros(
-            self.num_layers, batch_size, self.hidden_size))
+            self.coef*self.num_layers, batch_size, self.hidden_size))
 
         return hidden, cell
