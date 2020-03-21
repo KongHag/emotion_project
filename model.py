@@ -25,10 +25,12 @@ class RecurrentNet(nn.Module):
                                   batch_first=True,
                                   dropout=dropout,
                                   bidirectional=self.bidirectional)
+        self.dropout_layer=nn.Dropout(dropout)
         self.out_layer = nn.Linear(self.coef*self.hidden_size, output_size, bias=True)
 
     def forward(self, X, hidden):
         X, hidden = self.lstm_layer(X, hidden)
+        X = self.dropout_layer(X)
         X = self.out_layer(X)
 
         return X
