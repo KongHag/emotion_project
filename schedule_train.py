@@ -4,16 +4,17 @@ import sys
 
 config = {
     'seq_len': 20,
-    'num_hidden': 1,
-    'hidden_size': 32,
+    'num_hidden': 2,
+    'hidden_size': 512,
     'lr': 0.001,
-    'batch_size': 128,
-    'grad_clip': None,
+    'batch_size': 16,
+    'grad_clip': 1,
     'nb_epoch': 50,
-    'optimizer': 'SGD',
+    'optimizer': 'RMSprop',
     'crit': 'MSE',
-    'weight_decay': 0,
-    'dropout': 0,
+    'weight_decay': 1e-4,
+    'bidirect': True,
+    'dropout': 0.3,
     'logger_level': 20,
     'fragment': 1
 }
@@ -23,34 +24,14 @@ logger = logging.getLogger()
 logger.setLevel(config['logger_level'])
 
 
-seq_lens = [2**5, 2**7, 2**9]
-num_hiddens = [2, 4, 6]
-weight_decays = [1e-2, 1e-4, 1e-6]
-dropouts = [0.1, 0.3, 0.5]
-grad_clips = [1e2, 1e1, 1e0]
-hidden_sizes = [2**6, 2**8, 2**10]
+for arg_name, arg in config.items():
+    logger.info(
+        "initialization -- {} - {}".format(arg_name, arg))
 
-for seq_len in seq_lens:
-    config['seq_len'] = seq_len
-    for num_hidden in num_hiddens:
-        config['num_hidden'] = num_hidden
-        for weight_decay in weight_decays:
-            config['weight_decay'] = weight_decay
-            for dropout in dropouts:
-                config['dropout'] = dropout
-                for grad_clip in grad_clips:
-                    config['grad_clip'] = grad_clip
-                    for hidden_size in hidden_sizes:
-                        config['hidden_size'] = hidden_size
+try:
+    train_losses, test_losses = run(config)
+    save_config_and_results(
+        config, train_losses, test_losses)
 
-                        for arg_name, arg in config.items():
-                            logger.info(
-                                "initialization -- {} - {}".format(arg_name, arg))
-
-                        try:
-                            train_losses, test_losses = run(config)
-                            save_config_and_results(
-                                config, train_losses, test_losses)
-
-                        except Exception as exception:
-                            logger.critical(sys.exc_info())
+except Exception as exception:
+    logger.critical(sys.exc_info())
