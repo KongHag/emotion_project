@@ -52,12 +52,13 @@ class MediaEval18(Dataset):
     }
 
     def __init__(self, root='./data', train=True, seq_len=100, shuffle=False,
-                 fragment=1, features=['all']):
+                 fragment=1, features=['all'], overlapping=True):
         self.root = root
         self.train = train
         self.seq_len = seq_len
         self.shuffle = shuffle
         self.features = features
+        self.overlapping = overlapping
 
         all_X, all_Y = load_data()
         start_test = 50
@@ -79,7 +80,7 @@ class MediaEval18(Dataset):
             start_idx = 0
             while start_idx + self.seq_len < duration:
                 yield {"id_movie": movie_id, "start_idx": start_idx}
-                start_idx += 1
+                start_idx += 1 if self.overlapping else self.seq_len
 
     def get_img(self, movie_id, img_idx):
         """From a movie_id, returns a sequence of seq_len seconds, starting
@@ -127,7 +128,7 @@ class MediaEval18(Dataset):
 if __name__ == "__main__":
     from torch.utils.data import DataLoader
     trainset = MediaEval18(root='./data', train=True, seq_len=20,
-                           features=['visual'], fragment=0.05)
+                           features=['visual'], fragment=0.05, overlapping=True)
     trainloader = DataLoader(
         trainset, batch_size=128, shuffle=True)
 
