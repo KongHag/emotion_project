@@ -1,6 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-TODO : write a docstring
+Defines the the logger object to track execution
+
+Logs are stored into logs/emotion_YYYY-mm-dd.log files
+Default logger level is set to INFO, use --logger-level DEBUG tag
+to get more information about execution trace.
+
+To setup logger :
+>>> from log import stetup_custom_logger
+>>> logger = setup_custom_logger()
+
+ To log log into file :
+>>> logger.info("my first log message")
+
+Content of logs/emotion_YYYY-mm-dd.log
+> YYYY-mm-dd HH:MM:SS,sss - INFO - <module> - my first message
 """
 
 import logging
