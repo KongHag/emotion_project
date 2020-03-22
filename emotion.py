@@ -26,7 +26,7 @@ import argparse
 import torch
 from dataset import MediaEval18
 from torch.utils.data import DataLoader
-from model import RecurrentNet
+from model import RecurrentNet, RecurrentNetFeature
 from training import train_model
 from log import setup_custom_logger
 import logging
@@ -99,7 +99,7 @@ def run(config):
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
-    model = RecurrentNet(input_size=next(iter(trainset))[0].shape[1],
+    model = RecurrentNetFeature(input_size=next(iter(trainset))[0].shape[1],
                          hidden_size=config['hidden_size'],
                          num_layers=config['num_hidden'],
                          output_size=2,

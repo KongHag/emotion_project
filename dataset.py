@@ -35,6 +35,7 @@ class MediaEval18(Dataset):
         seq_len (int, seq_len) : default 100. nb of frame in a single sample
         shuffle (bool, optional) : default False. Shuffle or not the data
         fragment (float, optional) : default 1. From 0 to 1, percent of dataset used
+        overlapping (bool, optional) : Allow the sequences to overlap each other
     """
     _features_len = {
         "acc": range(0, 256),
