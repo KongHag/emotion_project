@@ -76,10 +76,10 @@ La configuration choisie, ainsi que les résultats seront stockés dans le dossi
 - [ ] Implémenter un scheduler.
 - [x] Implémenter régularisation L2.
 - [x] Implémenter le lstm bidirectionnel (buggé pour l'instant).
-- [ ] Ecrire une jolie docstring au début du fichier ```emotion.py```.
-- [ ] Ecrire une jolie docstring au début du fichier ```model.py```.
-- [ ] Ecrire une jolie docstring au début du fichier ```log.py```.
-- [ ] Ecrire une jolie docstring au début du fichier ```training.py```.
+- [x] Ecrire une jolie docstring au début du fichier ```emotion.py```.
+- [x] Ecrire une jolie docstring au début du fichier ```model.py```.
+- [x] Ecrire une jolie docstring au début du fichier ```log.py```.
+- [x] Ecrire une jolie docstring au début du fichier ```training.py```.
 
 --------------------
 
