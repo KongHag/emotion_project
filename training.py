@@ -1,6 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-TODO : write a doctring
+Defines the training & testing phase of a model
+
+Parameters for the training phase (optimizer, criterion, ...)
+are setup as argumetns when executing emotion.py
+
+For each epoch & for each batch in the dataset :
+    - send tensors to gpu if available
+    - compute output of network
+    - backpropagate if training
+> return the test loss and training loss
+
+How to use :
+>>> train_losses, test_losses = train_model(
+            model=model, trainloader=trainloader, testloader=testloader,
+            criterion=criterion, optimizer=optimizer, device=device,
+            grad_clip=config['grad_clip'],
+            nb_epoch=config['nb_epoch']
+        )
 """
 
 import numpy as np
