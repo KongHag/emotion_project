@@ -19,9 +19,11 @@ Size of the batch 3 : torch.Size([128, 20, 5367])
 
 import torch
 import numpy as np
-from read_data import load_data
+from read_data import load_data, load_mean_std
 from torch.utils.data import Dataset
 from log import setup_custom_logger
+import warnings
+warnings.filterwarnings("ignore")
 
 logger = setup_custom_logger("dataset")
 
@@ -61,6 +63,11 @@ class MediaEval18(Dataset):
         self.overlapping = overlapping
 
         all_X, all_Y = load_data()
+
+        # Normalize data
+        mean, std = load_mean_std()
+        all_X = [np.divide(np.subtract(x, mean), std) for x in all_X]
+
         start_test = 50
         if self.train:
             self.data = all_X[:start_test], all_Y[:start_test]
@@ -127,10 +134,10 @@ class MediaEval18(Dataset):
 
 if __name__ == "__main__":
     from torch.utils.data import DataLoader
-    trainset = MediaEval18(root='./data', train=True, seq_len=20,
-                           features=['visual'], fragment=0.05, overlapping=True)
+    trainset = MediaEval18(root='./data', train=True, seq_len=32,
+                           features=['all'], fragment=1, overlapping=False)
     trainloader = DataLoader(
-        trainset, batch_size=128, shuffle=True)
+        trainset, batch_size=256, shuffle=True)
 
-    for i, data in enumerate(trainloader):
-        print("Size of the batch", i, ":", data[0].shape)
+    for i, (X, Y) in enumerate(trainloader):
+        print("Size of the batch", i, ":", X.shape)

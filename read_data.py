@@ -222,17 +222,39 @@ def dump_data():
         XX.append(X)
         YY.append(Y)
 
+    mean, std = compute_mean_std(XX)
+    pickle.dump(mean, open("data/x_mean.pickle", "wb"))
+    pickle.dump(std, open("data/x_std.pickle", "wb"))
+
     pickle.dump(XX, open("data/x_train.pickle", "wb"))
     pickle.dump(YY, open("data/y_train.pickle", "wb"))
 
+
+def compute_mean_std(all_X):
+    """Return an approximate mean and std for every feature"""
+    concatenated = np.concatenate(all_X, axis=0).astype(np.float32)
+
+    # # Only 100 frames are used. Computation time would be to long otherwise
+    # np.random.shuffle(concatenated)
+    # concatenated = concatenated[:100]
+
+    mean = np.mean(concatenated, axis=0)
+    std = np.std(concatenated, axis=0)
+    return mean, std
 
 def load_data():
     return(
         pickle.load(open("data/x_train.pickle", "rb")),
         pickle.load(open("data/y_train.pickle", "rb")))
 
+def load_mean_std():
+    return(
+        pickle.load(open("data/x_mean.pickle", "rb")),
+        pickle.load(open("data/x_std.pickle", "rb")))
+
 
 if __name__ == '__main__':
     X, Y = load_data()
+    mean, std = load_mean_std()
     for i, (x, y) in enumerate(zip(X, Y)):
         print(i, len(x), len(y))
