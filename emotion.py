@@ -1,6 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-TODO : write a docstring
+Defines executable to run a training of a Recurrent net based on given parameters
+
+This will
+    - create a RecurrentNet based on input parameters
+    - train it with the input data of Liris dataset,
+    - log the train loss and test loss at each epoch in the log file
+    - plot the train_loss x epoch and test_loss x epoch graph in /results folder
+
+How to use :
+> emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
+                  [--hidden-size HIDDEN_SIZE] [--lr LR]
+                  [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
+                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
+                  [--weight-decay WEIGHT_DECAY] [-D DROPOUT]
+                  [--logger-level LOGGER_LEVEL] [--fragment FRAGMENT]
+                  [--features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} [{acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} ...]]
+                  [--no-overlapping]
 """
 
 import sys
