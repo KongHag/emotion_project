@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-TODO : write a doctring
+Defines the recurrent network.
+The network used is a LSTM network
+Input >> LSTM layer >> FC layer >> Output
+
+To setup recurrent net :
+>>> from model import RecurrentNet
+>>> model = RecurrentNet(input_size, hidden_size, num_layers, output_size, dropout, bidirectional)
 """
 
 import torch
