@@ -99,12 +99,13 @@ def run(config):
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
-    model = RecurrentNetFeature(input_size=next(iter(trainset))[0].shape[1],
-                         hidden_size=config['hidden_size'],
-                         num_layers=config['num_hidden'],
-                         output_size=2,
-                         dropout=config['dropout'],
-                         bidirectional=config['bidirect'])
+    model = RecurrentNetFeature()
+    # (input_size=next(iter(trainset))[0].shape[1],
+    #                      hidden_size=config['hidden_size'],
+    #                      num_layers=config['num_hidden'],
+    #                      output_size=2,
+    #                      dropout=config['dropout'],
+    #                      bidirectional=config['bidirect'])
     model.to(device)
     logger.info("model : {}".format(model))
 

@@ -67,60 +67,72 @@ class RecurrentNetFeature(nn.Module):
         "fc6": range(1271, 5367)
     }
 
-    def __init__(self, input_size, hidden_size, num_layers, output_size,
-                 dropout, bidirectional):
+    def __init__(self):
         super(RecurrentNetFeature, self).__init__()
 
-        self.hidden_size = hidden_size
+        self.conv1d_acc_1 = torch.nn.Conv1d(in_channels=4, out_channels=8,
+                                            kernel_size=5, stride=3)
+        self.conv1d_acc_2 = torch.nn.Conv1d(in_channels=8, out_channels=16,
+                                            kernel_size=5, stride=3)
+        self.fc_layers_acc = nn.Linear(
+            in_features=16*6, out_features=2, bias=True)
+        # self.fc_layers_cedd = nn.Linear(
+        #     len(self._features_len["cedd"]), 32, bias=True)
 
-        self.fc_layers = [
-            (feature_idx,
-            nn.Linear(len(feature_idx), 32, bias=True))
-            for feature_idx in self._features_len.values()
-        ]
+        # self.lstm_layer = nn.LSTM(input_size=32*2,
+        #                           hidden_size=self.hidden_size,
+        #                           num_layers=1,
+        #                           bias=True,
+        #                           batch_first=True,
+        #                           bidirectional=True)
 
-        self.lstm_layer = nn.LSTM(input_size=32*len(self.fc_layers),
-                                  hidden_size=hidden_size,
-                                  num_layers=1,
-                                  bias=True,
-                                  batch_first=True,
-                                  bidirectional=True)
+        # self.out_layer = nn.Linear(2*self.hidden_size, 2, bias=True)
 
-        self.out_layer = nn.Linear(2*self.hidden_size, 2, bias=True)
+    def forward(self, X):
 
-    def forward(self, X, hidden_cell):
-        Xs = []
-        for feature_idx, fc_layer in self.fc_layers:
-            pX = X[:,:,feature_idx]
-            output = fc_layer(pX)
-            Xs.append(output)
-        X = torch.cat(Xs,dim=2)
-        X, hidden = self.lstm_layer(X, hidden_cell)
-        X = self.out_layer(X)
-        return X
+        X_acc = X[:, :, :len(self._features_len["acc"])]
+        batch_size = X_acc.shape[0]
+        seq_len = X_acc.shape[1]
+        X_acc = torch.reshape(X_acc, (batch_size * seq_len, 4, 64))
 
-    def initHelper(self, batch_size):
-        # initialize hidden states to 0
-        hidden = Variable(torch.zeros(
-            2, batch_size, self.hidden_size))
-        cell   = Variable(torch.zeros(
-            2, batch_size, self.hidden_size))
+        X_acc = self.conv1d_acc_1(X_acc)
+        X_acc = self.conv1d_acc_2(X_acc)
+        X_acc = torch.reshape(X_acc, (X_acc.shape[0], 16*6))
+        X_acc = self.fc_layers_acc(X_acc)
+        X_acc = torch.reshape(X_acc, (batch_size, seq_len, 2))
 
-        return hidden, cell
+        # X_cedd = X[:, :, :len(self._features_len["cedd"])]
+        # output_cedd = self.fc_layers_cedd(X_cedd)
+
+        # fc_outputs = (output_acc, output_cedd)
+        # X = torch.cat(fc_outputs, dim=2)
+        # X, hidden = self.lstm_layer(X, hidden_cell)
+        # X = self.out_layer(X)
+        return X_acc
+
+    # def initHelper(self, batch_size):
+    #     # initialize hidden states to 0
+    #     hidden = Variable(torch.zeros(
+    #         2, batch_size, self.hidden_size))
+    #     cell = Variable(torch.zeros(
+    #         2, batch_size, self.hidden_size))
+
+    #     return hidden, cell
 
 
 if __name__ == '__main__':
     from dataset import MediaEval18
     from torch.utils.data import DataLoader
 
-    my_set = MediaEval18(root='./data', seq_len=20, fragment=0.001, features=['visual'])
+    my_set = MediaEval18(root='./data', seq_len=20,
+                         fragment=0.001, features=['visual'])
     my_loader = DataLoader(my_set, batch_size=16)
 
     X, Y = next(iter(my_loader))
 
-    model = RecurrentNetFeature(hidden_size = 32)
+    model = RecurrentNetFeature()
 
-    hidden, cell = model.initHelper(X.shape[0])
-    output = model(X, (hidden, cell))
+    print(model)
 
-
+    output = model(X)
+    print(output.shape)
