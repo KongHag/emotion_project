@@ -135,43 +135,43 @@ class RecurrentNetFeature(nn.Module):
         X_acc = X[:, :, self._features_idx["acc"]
                   [0]:self._features_idx["acc"][1]]
         X_acc = torch.reshape(X_acc, (batch_size * seq_len, 4, 64))
-        X_acc = self.conv1d_acc_1(X_acc)
+        X_acc = F.relu(self.conv1d_acc_1(X_acc))
         X_acc = self.maxpool1d_acc_1(X_acc)
-        X_acc = self.conv1d_acc_2(X_acc)
+        X_acc = F.relu(self.conv1d_acc_2(X_acc))
         X_acc = self.maxpool1d_acc_2(X_acc)
         X_acc = torch.reshape(X_acc, (X_acc.shape[0], 16*13))
 
         X_cedd = X[:, :, self._features_idx["cedd"]
                    [0]:self._features_idx["cedd"][1]]
         X_cedd = torch.reshape(X_cedd, (batch_size * seq_len, 6, 24))
-        X_cedd = self.conv1d_cedd_1(X_cedd)
+        X_cedd = F.relu(self.conv1d_cedd_1(X_cedd))
         X_cedd = self.maxpool1d_cedd_1(X_cedd)
-        X_cedd = self.conv1d_cedd_2(X_cedd)
+        X_cedd = F.relu(self.conv1d_cedd_2(X_cedd))
         X_cedd = self.maxpool1d_cedd_2(X_cedd)
         X_cedd = torch.reshape(X_cedd, (X_cedd.shape[0], 24*3))
 
         X_eh = X[:, :, self._features_idx["eh"]
                  [0]:self._features_idx["eh"][1]]
         X_eh = torch.reshape(X_eh, (batch_size * seq_len, 5, 4, 4))
-        X_eh = self.conv2d_eh_1(X_eh)
+        X_eh = F.relu(self.conv2d_eh_1(X_eh))
         X_eh = self.maxpool2d_eh_1(X_eh)
         X_eh = torch.reshape(X_eh, (X_eh.shape[0], 10*2*2))
 
         X_fcth = X[:, :, self._features_idx["fcth"]
                    [0]:self._features_idx["fcth"][1]]
         X_fcth = torch.reshape(X_fcth, (batch_size * seq_len, 8, 24))
-        X_fcth = self.conv1d_fcth_1(X_fcth)
+        X_fcth = F.relu(self.conv1d_fcth_1(X_fcth))
         X_fcth = self.maxpool1d_fcth_1(X_fcth)
-        X_fcth = self.conv1d_fcth_2(X_fcth)
+        X_fcth = F.relu(self.conv1d_fcth_2(X_fcth))
         X_fcth = self.maxpool1d_fcth_2(X_fcth)
         X_fcth = torch.reshape(X_fcth, (X_fcth.shape[0], 32*5))
 
         X_jcd = X[:, :, self._features_idx["jcd"]
                    [0]:self._features_idx["jcd"][1]]
         X_jcd = torch.reshape(X_jcd, (batch_size * seq_len, 7, 24))
-        X_jcd = self.conv1d_jcd_1(X_jcd)
+        X_jcd = F.relu(self.conv1d_jcd_1(X_jcd))
         X_jcd = self.maxpool1d_jcd_1(X_jcd)
-        X_jcd = self.conv1d_jcd_2(X_jcd)
+        X_jcd = F.relu(self.conv1d_jcd_2(X_jcd))
         X_jcd = self.maxpool1d_jcd_2(X_jcd)
         X_jcd = torch.reshape(X_jcd, (X_jcd.shape[0], 28*6))
 
@@ -185,6 +185,7 @@ class RecurrentNetFeature(nn.Module):
         # fc_outputs = (output_acc, output_cedd)
         # X = torch.cat(fc_outputs, dim=2)
         X, hidden = self.lstm_layer(X, hidden_and_cell)
+        X = F.relu(X)
         X = self.dropout1(X)
         X = F.relu(self.fc_layer(X))
         return X
