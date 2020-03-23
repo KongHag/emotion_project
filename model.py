@@ -124,8 +124,11 @@ class RecurrentNetFeature(nn.Module):
 
         self.dropout1 = nn.Dropout(dropout)
 
-        self.fc_layer = nn.Linear(
-            in_features=self.cnn_out_dim*2, out_features=2, bias=True)
+        self.fc_layer1 = nn.Linear(
+            in_features=self.cnn_out_dim*2, out_features=64, bias=True)
+
+        self.fc_layer2 = nn.Linear(
+            in_features=64, out_features=2, bias=True)
 
     def forward(self, X, hidden_and_cell):
 
@@ -187,7 +190,8 @@ class RecurrentNetFeature(nn.Module):
         X, hidden = self.lstm_layer(X, hidden_and_cell)
         X = F.relu(X)
         X = self.dropout1(X)
-        X = F.relu(self.fc_layer(X))
+        X = F.relu(self.fc_layer1(X))
+        X = F.relu(self.fc_layer2(X))
         return X
 
     def initHelper(self, batch_size):
