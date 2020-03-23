@@ -99,7 +99,7 @@ def run(config):
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
-    model = RecurrentNetFeature()
+    model = RecurrentNetFeature(dropout=config['dropout'])
     # (input_size=next(iter(trainset))[0].shape[1],
     #                      hidden_size=config['hidden_size'],
     #                      num_layers=config['num_hidden'],
