@@ -65,7 +65,8 @@ class RecurrentNetFeature(nn.Module):
         "sc": [933, 997],
         "tamura": [997, 1015],
         "lbp": [1015, 1271],
-        "fc6": [1271, 5367]
+        "fc6": [1271, 5367],
+        "audio": [5367, 6950]
     }
 
     def __init__(self, dropout):
@@ -112,11 +113,11 @@ class RecurrentNetFeature(nn.Module):
         self.maxpool1d_jcd_2 = nn.MaxPool1d(
             kernel_size=2)
 
-        self.cnn_out_dim = 16*13 + 24*3 + 10*2*2 + 32*5 + 28*6 + 4096
+        self.cnn_out_dim = 16*13 + 24*3 + 10*2*2 + 32*5 + 28*6 + 4096 + 1583
 
         self.lstm_layer = nn.LSTM(input_size=self.cnn_out_dim,
                                   hidden_size=self.cnn_out_dim,
-                                  num_layers=1,
+                                  num_layers=2,
                                   dropout=dropout,
                                   bias=True,
                                   batch_first=True,
@@ -182,11 +183,13 @@ class RecurrentNetFeature(nn.Module):
                    [0]:self._features_idx["fc6"][1]]
         X_fc6 = torch.reshape(X_fc6, (batch_size * seq_len, 4096))
 
-        X = torch.cat((X_acc, X_cedd, X_eh, X_fcth, X_jcd, X_fc6), dim=1)
+        X_audio = X[:, :, self._features_idx["audio"]
+                   [0]:self._features_idx["audio"][1]]
+        X_audio = torch.reshape(X_audio, (batch_size * seq_len, 1583))
+
+        X = torch.cat((X_acc, X_cedd, X_eh, X_fcth, X_jcd, X_fc6, X_audio), dim=1)
         X = torch.reshape(X, (batch_size, seq_len, self.cnn_out_dim))
 
-        # fc_outputs = (output_acc, output_cedd)
-        # X = torch.cat(fc_outputs, dim=2)
         X, hidden = self.lstm_layer(X, hidden_and_cell)
         X = F.relu(X)
         X = self.dropout1(X)
@@ -196,9 +199,9 @@ class RecurrentNetFeature(nn.Module):
 
     def initHelper(self, batch_size):
         # initialize hidden states to 0
-        hidden = Variable(torch.zeros(
+        hidden = Variable(torch.randn(
             2, batch_size, self.cnn_out_dim))
-        cell = Variable(torch.zeros(
+        cell = Variable(torch.randn(
             2, batch_size, self.cnn_out_dim))
 
         return hidden, cell
@@ -209,7 +212,7 @@ if __name__ == '__main__':
     from torch.utils.data import DataLoader
 
     my_set = MediaEval18(root='./data', seq_len=20,
-                         fragment=0.1, features=['visual'])
+                         fragment=0.1, features=['all'])
     my_loader = DataLoader(my_set, batch_size=32)
 
     X, Y = next(iter(my_loader))
