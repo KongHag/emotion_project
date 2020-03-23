@@ -113,7 +113,7 @@ class RecurrentNetFeature(nn.Module):
         self.maxpool1d_jcd_2 = nn.MaxPool1d(
             kernel_size=2)
 
-        self.cnn_out_dim = 16*13 + 24*3 + 10*2*2 + 32*5 + 28*6 + 4096 + 1583
+        self.cnn_out_dim = 16*13 + 24*3 + 10*2*2 + 32*5 + 28*6 + 4096 #+ 1583
 
         self.lstm_layer = nn.LSTM(input_size=self.cnn_out_dim,
                                   hidden_size=self.cnn_out_dim//32,
@@ -183,11 +183,11 @@ class RecurrentNetFeature(nn.Module):
                    [0]:self._features_idx["fc6"][1]]
         X_fc6 = torch.reshape(X_fc6, (batch_size * seq_len, 4096))
 
-        X_audio = X[:, :, self._features_idx["audio"]
-                   [0]:self._features_idx["audio"][1]]
-        X_audio = torch.reshape(X_audio, (batch_size * seq_len, 1583))
+        # X_audio = X[:, :, self._features_idx["audio"]
+        #            [0]:self._features_idx["audio"][1]]
+        # X_audio = torch.reshape(X_audio, (batch_size * seq_len, 1583))
 
-        X = torch.cat((X_acc, X_cedd, X_eh, X_fcth, X_jcd, X_fc6, X_audio), dim=1)
+        X = torch.cat((X_acc, X_cedd, X_eh, X_fcth, X_jcd, X_fc6), dim=1)
         X = torch.reshape(X, (batch_size, seq_len, self.cnn_out_dim))
 
         X, hidden = self.lstm_layer(X, hidden_and_cell)
