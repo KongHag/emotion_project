@@ -116,7 +116,7 @@ class RecurrentNetFeature(nn.Module):
         self.cnn_out_dim = 16*13 + 24*3 + 10*2*2 + 32*5 + 28*6 + 4096 + 1583
 
         self.lstm_layer = nn.LSTM(input_size=self.cnn_out_dim,
-                                  hidden_size=self.cnn_out_dim,
+                                  hidden_size=self.cnn_out_dim//32,
                                   num_layers=2,
                                   dropout=dropout,
                                   bias=True,
@@ -126,7 +126,7 @@ class RecurrentNetFeature(nn.Module):
         self.dropout1 = nn.Dropout(dropout)
 
         self.fc_layer1 = nn.Linear(
-            in_features=self.cnn_out_dim*2, out_features=64, bias=True)
+            in_features=self.cnn_out_dim//32*2, out_features=64, bias=True)
 
         self.fc_layer2 = nn.Linear(
             in_features=64, out_features=2, bias=True)
@@ -200,9 +200,9 @@ class RecurrentNetFeature(nn.Module):
     def initHelper(self, batch_size):
         # initialize hidden states to 0
         hidden = Variable(torch.randn(
-            2, batch_size, self.cnn_out_dim))
+            4, batch_size, self.cnn_out_dim//32))
         cell = Variable(torch.randn(
-            2, batch_size, self.cnn_out_dim))
+            4, batch_size, self.cnn_out_dim//32))
 
         return hidden, cell
 
