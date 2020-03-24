@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Defines the recurrent network.
+Defines two recurrent networks.
 The network used is a LSTM network
-Input >> LSTM layer >> FC layer >> Output
+
+RecurrentNet        : Input >> LSTM layer >> FC layer >> Output
+RecurrentNetWithCNN : Input >> CNN >> LSTM layer >> FC layer >> Output
 
 To setup recurrent net :
->>> from model import RecurrentNet
->>> model = RecurrentNet(input_size, hidden_size, num_layers, output_size, dropout, bidirectional)
+>>> from model import RecurrentNet, RecurrentNetWithCNN
+>>> model = RecurrentNet(input_size, hidden_size, num_layers,
+        output_size, dropout, bidirectional)
+or 
+>>> model = RecurrentNetWithCNN(input_size, hidden_size, num_layers,
+        output_size, dropout, bidirectional)
 """
 
 import torch
@@ -16,8 +22,20 @@ import torch.nn.functional as F
 
 
 class RecurrentNet(nn.Module):
+    """An RNN to predict the emotions induced by the videos."""
+
     def __init__(self, input_size, hidden_size, num_layers, output_size,
                  dropout, bidirectional):
+        """Initilialize the RNN.
+
+        Arguments:
+            input_size {int} -- size of the input layer
+            hidden_size {int} -- size of the hidden layer
+            num_layers {int} -- number of layers
+            output_size {int} -- ouput size
+            dropout {float} -- dropout probability, from 0 to 1
+            bidirectional {bool} -- whether the lstm layer is bidirectionnal
+        """
         super(RecurrentNet, self).__init__()
 
         self.num_layers = num_layers
@@ -44,7 +62,7 @@ class RecurrentNet(nn.Module):
         return X
 
     def initHelper(self, batch_size):
-        # initialize hidden states to 0
+        """Initilize hidden and cell with random values"""
         hidden = Variable(torch.zeros(
             self.coef*self.num_layers, batch_size, self.hidden_size))
         cell = Variable(torch.zeros(
@@ -53,7 +71,11 @@ class RecurrentNet(nn.Module):
         return hidden, cell
 
 
-class RecurrentNetFeature(nn.Module):
+class RecurrentNetWithCNN(nn.Module):
+    """An RNN to predict the emotions induced by the videos.
+
+    This RNN has CNN layers for several input features.
+    """
     _features_idx = {
         "acc": [0, 256],
         "cedd": [256, 400],
@@ -69,8 +91,25 @@ class RecurrentNetFeature(nn.Module):
         "audio": [5367, 6950]
     }
 
-    def __init__(self, dropout):
-        super(RecurrentNetFeature, self).__init__()
+    def __init__(self, input_size, hidden_size, num_layers, output_size,
+                 dropout, bidirectional):
+        """Initilialize the RNN.
+
+        Arguments:
+            input_size {int} -- size of the input layer. Deprecated, not used anymore
+            hidden_size {int} -- size of the hidden layer
+            num_layers {int} -- number of layers for lstm
+            output_size {int} -- output size
+            dropout {float} -- dropout probability, from 0 to 1
+            bidirectional {bool} -- whether the lstm layer is bidirectionnal
+        """
+
+        self.num_layers = num_layers
+        self.hidden_size = hidden_size
+        self.bidirectional = bidirectional
+        self.coef = 2 if self.bidirectional else 1
+
+        super(RecurrentNetWithCNN, self).__init__()
 
         self.conv1d_acc_1 = nn.Conv1d(
             in_channels=4, out_channels=8, kernel_size=5)
@@ -94,7 +133,7 @@ class RecurrentNetFeature(nn.Module):
             in_channels=5, out_channels=10, kernel_size=3, padding=1)
         self.maxpool2d_eh_1 = nn.MaxPool2d(
             kernel_size=2)
-        
+
         self.conv1d_fcth_1 = nn.Conv1d(
             in_channels=8, out_channels=16, kernel_size=5)
         self.maxpool1d_fcth_1 = nn.MaxPool1d(
@@ -113,23 +152,23 @@ class RecurrentNetFeature(nn.Module):
         self.maxpool1d_jcd_2 = nn.MaxPool1d(
             kernel_size=2)
 
-        self.cnn_out_dim = 16*13 + 24*3 + 10*2*2 + 32*5 + 28*6 + 4096 #+ 1583
+        self.cnn_out_dim = 16*13 + 24*3 + 10*2*2 + 32*5 + 28*6 + 4096  # + 1583
 
         self.lstm_layer = nn.LSTM(input_size=self.cnn_out_dim,
-                                  hidden_size=self.cnn_out_dim//32,
-                                  num_layers=2,
+                                  hidden_size=self.hidden_size,
+                                  num_layers=self.num_layers,
                                   dropout=dropout,
                                   bias=True,
                                   batch_first=True,
-                                  bidirectional=True)
+                                  bidirectional=self.bidirectional)
 
         self.dropout1 = nn.Dropout(dropout)
 
         self.fc_layer1 = nn.Linear(
-            in_features=self.cnn_out_dim//32*2, out_features=64, bias=True)
+            in_features=self.hidden_size*self.coef, out_features=self.hidden_size, bias=True)
 
         self.fc_layer2 = nn.Linear(
-            in_features=64, out_features=2, bias=True)
+            in_features=self.hidden_size, out_features=output_size, bias=True)
 
     def forward(self, X, hidden_and_cell):
 
@@ -171,7 +210,7 @@ class RecurrentNetFeature(nn.Module):
         X_fcth = torch.reshape(X_fcth, (X_fcth.shape[0], 32*5))
 
         X_jcd = X[:, :, self._features_idx["jcd"]
-                   [0]:self._features_idx["jcd"][1]]
+                  [0]:self._features_idx["jcd"][1]]
         X_jcd = torch.reshape(X_jcd, (batch_size * seq_len, 7, 24))
         X_jcd = F.relu(self.conv1d_jcd_1(X_jcd))
         X_jcd = self.maxpool1d_jcd_1(X_jcd)
@@ -180,7 +219,7 @@ class RecurrentNetFeature(nn.Module):
         X_jcd = torch.reshape(X_jcd, (X_jcd.shape[0], 28*6))
 
         X_fc6 = X[:, :, self._features_idx["fc6"]
-                   [0]:self._features_idx["fc6"][1]]
+                  [0]:self._features_idx["fc6"][1]]
         X_fc6 = torch.reshape(X_fc6, (batch_size * seq_len, 4096))
 
         # X_audio = X[:, :, self._features_idx["audio"]
@@ -198,11 +237,11 @@ class RecurrentNetFeature(nn.Module):
         return X
 
     def initHelper(self, batch_size):
-        # initialize hidden states to 0
+        """Initilize hidden and cell with random values"""
         hidden = Variable(torch.randn(
-            4, batch_size, self.cnn_out_dim//32))
+            self.coef*self.num_layers, batch_size, self.hidden_size))
         cell = Variable(torch.randn(
-            4, batch_size, self.cnn_out_dim//32))
+            self.coef*self.num_layers, batch_size, self.hidden_size))
 
         return hidden, cell
 
@@ -211,15 +250,25 @@ if __name__ == '__main__':
     from dataset import MediaEval18
     from torch.utils.data import DataLoader
 
+    # Initilize dataset and dataloader
     my_set = MediaEval18(root='./data', seq_len=20,
                          fragment=0.1, features=['all'])
     my_loader = DataLoader(my_set, batch_size=32)
 
+    # Take one batch
     X, Y = next(iter(my_loader))
 
-    model = RecurrentNetFeature(dropout=0.3)
+    # Defines the model
+    model_without_CNN = RecurrentNet(X.shape[-1], hidden_size=16, num_layers=8,
+                                     output_size=2, dropout=0.5, bidirectional=True)
 
-    print(model)
-    hidden_and_cell = model.initHelper(batch_size=32)
-    output = model(X, hidden_and_cell)
-    print(output.shape)
+    model_with_CNN = RecurrentNetWithCNN(None, hidden_size=16, num_layers=8,
+                                         output_size=2, dropout=0.5, bidirectional=True)
+
+    hidden_and_cell = model_without_CNN.initHelper(batch_size=32)
+    output = model_without_CNN(X, hidden_and_cell)
+    print("output computed with model without CNN. shape :", output.shape)
+
+    hidden_and_cell = model_with_CNN.initHelper(batch_size=32)
+    output = model_with_CNN(X, hidden_and_cell)
+    print("output computed with model with CNN. shape :", output.shape)
