@@ -102,7 +102,7 @@ def do_one_epoch(model, loader, train, criterion, device,
 def train_model(model, trainloader, testloader, criterion, optimizer, device,
                 grad_clip, nb_epoch):
     """Train a model
-    
+
     Arguments:
         model {torch.nn.Module} -- model used
         trainloader {torch.utils.data.DataLoader} -- loader over train dataset
