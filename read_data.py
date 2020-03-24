@@ -1,11 +1,14 @@
 # coding:utf-8
-
 """Extract all the features and valence/arousal
 
+Considering you have the files data/x_train.pickle and data/y_train.pickle
 To load the data :
-    // Having the file data/x_train.pickle and data/y_train.pickle
-    from read_data import load_data
-    X, Y = load_data()
+>>> from read_data import load_data
+>>> X, Y = load_data()
+
+To load mean and standard deviation :
+>>> from read_data import load_mean_std
+>>> mean, std = load_mean_std()
 
 Errors found in the data:
     Movie 6 :
@@ -241,12 +244,25 @@ def compute_mean_std(all_X):
 
 
 def load_data():
+    """Load the MediaEval dataset. 
+    
+    Returns (X, Y)
+        X is a list of numpy.arrays (movie_lengt, 6950) with the 6950 features
+        Y is a list of numpy.arrays (movie_lenght, 2) with valence, arousal 
+    """
     return(
         pickle.load(open("data/x_train.pickle", "rb")),
         pickle.load(open("data/y_train.pickle", "rb")))
 
 
 def load_mean_std():
+    """Load mean and standard deviation computed over the features
+    of the MediaEval dataset.
+    
+    Returns (mean, std)
+        mean is a numpy.arrays (6950,) with the 6950 mean values of features
+        std is a numpy.arrays (6950,) with the 6950 std values of features
+    """
     return(
         pickle.load(open("data/x_mean.pickle", "rb")),
         pickle.load(open("data/x_std.pickle", "rb")))
