@@ -5,9 +5,9 @@
 Pour lancer un entrainement, il faut executer le script ```emotion.py```.
 
 ```
-usage: emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
-                  [--hidden-size HIDDEN_SIZE] [--lr LR]
-                  [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
+usage: emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
+                  [--num-hidden NUM_HIDDEN] [--hidden-size HIDDEN_SIZE]
+                  [--lr LR] [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
                   [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
                   [--weight-decay WEIGHT_DECAY] [-D DROPOUT]
                   [--logger-level LOGGER_LEVEL] [--fragment FRAGMENT]
@@ -18,6 +18,7 @@ Train Neural Network for emotion predictions
 
 optional arguments:
   -h, --help            show this help message and exit
+  --add-CNN             Use the model with a first layer of CNNs
   --seq-len SEQ_LEN     Length of a sequence
   --num-hidden NUM_HIDDEN
                         Number of hidden layers in NN
