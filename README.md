@@ -2,7 +2,7 @@
 
 ## Utilisation
 
-## Générer les données
+### Générer les données
 
 Télécharger l'ensemble des fichiers de MediaEval2018: [LIRIS-ACCEDE](https://liris-accede.ec-lyon.fr/), et placez-les dans le dossier ```data```de ce répertoire.
 
@@ -13,7 +13,7 @@ from read_data import dump_data
 dump_data()
 ```
 
-## Lancer un entrainement
+### Lancer un entrainement
 
 Pour lancer un entrainement, il faut executer le script ```emotion.py```.
 
