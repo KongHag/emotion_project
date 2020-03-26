@@ -12,12 +12,8 @@ For each epoch & for each batch in the dataset :
 > return the test loss and training loss
 
 How to use :
->>> train_losses, test_losses = train_model(
-            model=model, trainloader=trainloader, testloader=testloader,
-            criterion=criterion, optimizer=optimizer, device=device,
-            grad_clip=config['grad_clip'],
-            nb_epoch=config['nb_epoch']
-        )
+>>> train_losses, test_losses = train_model(model, trainloader, testloader,
+        criterion, optimizer, device, grad_clip,nb_epoch)
 """
 
 import numpy as np
@@ -29,6 +25,22 @@ logger = setup_custom_logger('Model training')
 
 def do_one_epoch(model, loader, train, criterion, device,
                  optimizer=None, grad_clip=None):
+    """Perform one epoch epoch
+
+    Arguments:
+        model {torch.nn.Module} -- model used
+        loader {torch.utils.data.DataLoader} -- loader used
+        train {bool} -- whether it is a trainig epoch
+        criterion {torch.nn.modules.loss._Loss} -- criterion used to compute the loss
+        device {str} -- device used
+
+    If train is True, you have to specify:
+        optimizer {torch.optim.optimizer.Optimizer} -- optimizer used for training
+        grad_clip {float} -- absolute max value of the grad
+
+    Returns:
+        float -- mean loss computed over the epoch
+    """
 
     losses = []
     for idx_batch, (X, Y) in enumerate(loader):
@@ -89,7 +101,21 @@ def do_one_epoch(model, loader, train, criterion, device,
 
 def train_model(model, trainloader, testloader, criterion, optimizer, device,
                 grad_clip, nb_epoch):
-    """Run this function to train the model"""
+    """Train a model
+
+    Arguments:
+        model {torch.nn.Module} -- model used
+        trainloader {torch.utils.data.DataLoader} -- loader over train dataset
+        testloader {torch.utils.data.DataLoader} -- loader over test dataset
+        criterion {torch.nn.modules.loss._Loss} -- criterion used to compute the loss
+        optimizer {torch.optim.optimizer.Optimizer} -- optimizer used for training
+        device {str} -- device used
+        grad_clip {float} -- absolute max value of the grad
+        nb_epoch {int} -- number of epoch
+
+    Returns:
+        (list, list) -- train_losses, test_losses computed at the end of every epoch
+    """
 
     logger.info("start training network")
     train_losses, test_losses = [], []

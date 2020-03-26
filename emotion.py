@@ -9,14 +9,14 @@ This will
     - plot the train_loss x epoch and test_loss x epoch graph in /results folder
 
 How to use :
-> emotion.py [-h] [--seq-len SEQ_LEN] [--num-hidden NUM_HIDDEN]
-                  [--hidden-size HIDDEN_SIZE] [--lr LR]
-                  [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
-                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
-                  [--weight-decay WEIGHT_DECAY] [-D DROPOUT]
-                  [--logger-level LOGGER_LEVEL] [--fragment FRAGMENT]
-                  [--features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} [{acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} ...]]
-                  [--no-overlapping]
+> emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
+             [--num-hidden NUM_HIDDEN] [--hidden-size HIDDEN_SIZE]
+             [--lr LR] [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
+             [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
+             [--weight-decay WEIGHT_DECAY] [-D DROPOUT]
+             [--logger-level LOGGER_LEVEL] [--fragment FRAGMENT]
+             [--features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} [{acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} ...]]
+             [--no-overlapping]
 """
 
 import sys
@@ -26,7 +26,7 @@ import argparse
 import torch
 from dataset import MediaEval18
 from torch.utils.data import DataLoader
-from model import RecurrentNet, RecurrentNetFeature
+from model import RecurrentNet, RecurrentNetWithCNN
 from training import train_model
 from log import setup_custom_logger
 import logging
@@ -38,6 +38,8 @@ features = MediaEval18._features_len.keys()
 parser = argparse.ArgumentParser(
     description='Train Neural Network for emotion predictions')
 
+parser.add_argument('--add-CNN', dest='model-with-CNN', action='store_true',
+                    default=False, help='Use the model with a first layer of CNNs')
 parser.add_argument("--seq-len", default=20, type=int,
                     help="Length of a sequence")
 parser.add_argument("--num-hidden", default=2, type=int,
@@ -99,12 +101,14 @@ def run(config):
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
-    model = RecurrentNetFeature(input_size=next(iter(trainset))[0].shape[1],
-                         hidden_size=config['hidden_size'],
-                         num_layers=config['num_hidden'],
-                         output_size=2,
-                         dropout=config['dropout'],
-                         bidirectional=config['bidirect'])
+    ModelClass = RecurrentNetWithCNN if config['model-with-CNN'] else RecurrentNet
+    model = ModelClass(
+        input_size=next(iter(trainset))[0].shape[1],
+        hidden_size=config['hidden_size'],
+        num_layers=config['num_hidden'],
+        output_size=2,
+        dropout=config['dropout'],
+        bidirectional=config['bidirect'])
     model.to(device)
     logger.info("model : {}".format(model))
 
@@ -133,6 +137,7 @@ def run(config):
         criterion=criterion, optimizer=optimizer, device=device,
         grad_clip=config['grad_clip'],
         nb_epoch=config['nb_epoch'])
+    logger.info("training done")
 
     return train_losses, test_losses
 
@@ -155,6 +160,7 @@ def save_config_and_results(config, train_losses, test_losses):
     # Save the config and the results
     with open(file_name, 'w') as file:
         json.dump(config_and_results, file)
+    logger.info("results saved")
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ results/*.json
 results/*.out
 
 # our data
-data/
+data/*.pickle
 
 # our models
 models*
