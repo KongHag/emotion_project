@@ -117,7 +117,7 @@ Ce projet a été réalisé en colaboration avec
 * Augustin ARDON
 * William BLAUFUKS
 * Lucas DORMOY
-* Quentin GALLOUEDEC
+* Quentin GALLOUÉDEC
 * Timothée HAGUENAUER
 
 Dans le cadre d'un projet de l'Ecole Centrale de Lyon commandité par Emmanuel DELLANDREA
