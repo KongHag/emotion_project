@@ -104,7 +104,7 @@ Usage :
 python show.py
 ```
 
-![Alt text](./results/graphs/emotion_2020-03-20_20_30_51.png)
+![Alt text](./results/graphs/emotion_2020-03-26_22-24-17.png)
 
 --------------------
 
