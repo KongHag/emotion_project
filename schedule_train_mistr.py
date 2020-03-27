@@ -9,45 +9,6 @@ from dataset import MediaEval18
 configs = []
 
 # ------------ LSTM 1 couche cachée  --------------------------
-configs.append({
-    'seq_len': 64,
-    'num_hidden': 1,
-    'hidden_size': 32,
-    'lr': 0.0001,
-    'batch_size': 64,
-    'grad_clip': 1,
-    'nb_epoch': 25,
-    'optimizer': 'RMSprop',
-    'crit': 'MSE',
-    'weight_decay': 1e-5,
-    'bidirect': True,
-    'dropout': 0.3,
-    'logger_level': 20,
-    'fragment': 1,
-    'features': 'all',
-    'overlapping': True,
-    'model-with-CNN': False
-})
-
-configs.append({
-    'seq_len': 64,
-    'num_hidden': 1,
-    'hidden_size': 128,
-    'lr': 0.0001,
-    'batch_size': 64,
-    'grad_clip': 1,
-    'nb_epoch': 25,
-    'optimizer': 'RMSprop',
-    'crit': 'MSE',
-    'weight_decay': 1e-5,
-    'bidirect': True,
-    'dropout': 0.3,
-    'logger_level': 20,
-    'fragment': 1,
-    'features': 'all',
-    'overlapping': True,
-    'model-with-CNN': False
-})
 
 configs.append({
     'seq_len': 64,
