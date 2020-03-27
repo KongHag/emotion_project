@@ -155,7 +155,7 @@ def save_config_and_results(config, train_losses, test_losses):
         os.makedirs('results')
 
     file_name = "results/emotion_" + \
-        time.strftime("%Y-%m-%d_%H:%M:%S") + ".json"
+        time.strftime("%Y-%m-%d_%H-%M-%S") + ".json"
 
     # Save the config and the results
     with open(file_name, 'w') as file:
