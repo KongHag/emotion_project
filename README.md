@@ -104,6 +104,8 @@ Usage :
 python show.py
 ```
 
+Le fichier `results/graphs/emotion_YYYY-mm-dd_HH-MM-SS.png` est généré avec en bleu la `train loss` et en orange la `test loss`
+
 ![Alt text](./results/graphs/emotion_2020-03-26_22-24-17.png)
 
 --------------------
