@@ -9,7 +9,7 @@ This will
     - plot the train_loss x epoch and test_loss x epoch graph in /results folder
 
 How to use :
-> emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
+> python emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
              [--num-hidden NUM_HIDDEN] [--hidden-size HIDDEN_SIZE]
              [--lr LR] [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
              [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]

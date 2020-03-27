@@ -1,6 +1,20 @@
 # Projet 3A : Détection d'émotions dans des séquences de films
 
-## Utilisation
+La prédiction des émotions induites par les vidéos est une problématique assez répandue, qui peut avoir des débouchées dans les technologies de la communication, 
+et notamment le marketing. En 2018, le laboratoire Liris a constitué un nouveau dataset constitué de séquences de films annotées en fonction des émotions induites
+sur le spectateur. Le but de ce projet a été de continuer les travaux déjà effectués dans le cadre de la compétition MédiaEval 2018 pour la prédiction des émotions induites 
+par les vidéos basée sur le dataset du laboratoire.
+
+**Le dataset** est composé de différentes features et annotations décrites [ici](data/README.md)
+
+## Prise en main
+
+### Prérequis
+
+Ce projet a été écrit à l'aide du framework PyTorch. Pour réaliser un entrainement ou exploiter le modèle il sera nécessaire de l'installer avec la commande
+```shell script
+pip install torch 
+```
 
 ### Générer les données
 
@@ -13,19 +27,26 @@ from read_data import dump_data
 dump_data()
 ```
 
-### Lancer un entrainement
+### Le modèle
+
+Le modèle utilisé est une succession entre des CNN à l'échelle de chaque feature puis un LSTM suivi de deux couches Fully Connected
+![Alt text](./architecture.svg)
+
+--------------------
+
+## Lancer un entrainement
 
 Pour lancer un entrainement, il faut executer le script ```emotion.py```.
 
 ```
-usage: emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
-                  [--num-hidden NUM_HIDDEN] [--hidden-size HIDDEN_SIZE]
-                  [--lr LR] [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
-                  [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
-                  [--weight-decay WEIGHT_DECAY] [-D DROPOUT]
-                  [--logger-level LOGGER_LEVEL] [--fragment FRAGMENT]
-                  [--features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} [{acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} ...]]
-                  [--no-overlapping]
+usage: python emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
+                         [--num-hidden NUM_HIDDEN] [--hidden-size HIDDEN_SIZE]
+                         [--lr LR] [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
+                         [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
+                         [--weight-decay WEIGHT_DECAY] [-D DROPOUT]
+                         [--logger-level LOGGER_LEVEL] [--fragment FRAGMENT]
+                         [--features {acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} [{acc,cedd,cl,eh,fcth,gabor,jcd,sc,tamura,lbp,fc6,visual,audio,all} ...]]
+                         [--no-overlapping]
 
 Train Neural Network for emotion predictions
 
@@ -63,39 +84,33 @@ La configuration choisie, ainsi que les résultats seront stockés dans le dossi
 
 --------------------
 
-## Tâches pour le projet
+## Analyse
 
-### Séance du 23/01/2020
+Les résultats obtenus sont stockés dans le dossier ```results```.
 
-- [x] Finir de lire l'article
-- [x] Créer un github
-- [x] Envoyer un mail à M. Dellandréa pour les soumissions à [MediaEval](http://www.multimediaeval.org/)
-- [X] Explorer la base de données
-  
-### Séance du 30/01/2020
+Un utilitaire python ```show.py``` est fourni et permet de générer les graphiques associés aux entrainements.
+L'utilitaire va automatiquement chercher tous les fichiers ```json``` non affichés et génère les graphiques correspondants.
 
-- [x] Terminer les fonction de lecture des données
-- [x] Lecture de doc torch sur les couches RNN
-- [x] Premier pipe
-- [x] Premier entraînement
-  
-### Séance 06/02/2020
+Usage :
+```shell script
+python show.py
+```
 
-- [x] argParser
+![Alt text](./results/graphs/emotion_2020-03-20_20_30_51.png)
 
-### Reste à faire
+--------------------
 
-- [ ] Etoffer et mettre à jour le ```README.md```.
-- [ ] Créer une fonction score, qui prend en entrée un modèle et qui renvoie son score, indépendament du criterion (Pearson ?), évalué sur le testset.
-- [x] Création d'un dossier ```results``` dans lequel est stocké un historique des configuration et les résultats obtenus
-- [x] Fonction qui lit les fichier du dossier ```results```et met en forme les résultats obtenus.
-- [ ] Implémenter un scheduler.
-- [x] Implémenter régularisation L2.
-- [x] Implémenter le lstm bidirectionnel (buggé pour l'instant).
-- [x] Ecrire une jolie docstring au début du fichier ```emotion.py```.
-- [x] Ecrire une jolie docstring au début du fichier ```model.py```.
-- [x] Ecrire une jolie docstring au début du fichier ```log.py```.
-- [x] Ecrire une jolie docstring au début du fichier ```training.py```.
+
+## Auteurs
+
+Ce projet a été réalisé en colaboration avec
+* Augustin ARDON
+* William BLAUFUKS
+* Lucas DORMOY
+* Quentin GALLOUEDEC
+* Timothée HAGUENAUER
+
+Dans le cadre d'un projet de l'Ecole Centrale de Lyon commandité par Emmanuel DELLANDREA
 
 --------------------
 
@@ -107,8 +122,3 @@ La configuration choisie, ainsi que les résultats seront stockés dans le dossi
 - [Thèse Yohan Baveye](https://tel.archives-ouvertes.fr/tel-01272240/document)
 
 --------------------
-
-
-
-
-
