@@ -1,5 +1,5 @@
 # training results
-results/*.json
+
 results/*.out
 
 # our data
@@ -143,5 +143,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-*.json
-*.json
+
