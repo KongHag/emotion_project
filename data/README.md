@@ -40,6 +40,7 @@ En sortie :
 - Valence and arousal annotations (sortie)
 - Fear annotations (sortie)
 
+--------------------
 
 ## Audio features
 
@@ -73,6 +74,8 @@ Pour chaque image, il y a 1 582 descripteurs :
 - 1 428 descripteurs type LLD (21 fonctions appliquées sur 68 contours LLD (low-level_descriptor))
 - 152 descripteurs type pitch-based LLD (19 fonctions appliquées sur les 8 pitch-based LLD)
 - 2 descripteurs : "the number of pitch onsets (pseudo syllables) and the total duration of the input are appended"
+
+--------------------
 
 ## Visual features
 
@@ -112,6 +115,8 @@ Avec
 
 Le fichier contient une liste de valeurs décimales séparées par une ```,``` dont la taille dépend du descripteur.
 
+--------------------
+
 ## Valence and arousal annotation
 
 Pour récupérer les valeurs valence et arousal d'un film, il suffit d'écrire :
@@ -134,11 +139,3 @@ Avec
 - ```MOVIE_ID``` : id du film, sur 2 caractères, de 0 à 65.
 
 Le fichier contient une liste de valeurs décimales séparées par une ```,``` . Les colonnes sont dans l'ordre : le temps, la valence et l'arousal.
-
-## Fear annotation
-
-Pas encore utilisé
-
-## Data
-
-Pas encore utilisé
