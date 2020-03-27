@@ -11,10 +11,18 @@ par les vidéos basée sur le dataset du laboratoire.
 
 ### Prérequis
 
-Ce projet a été écrit à l'aide du framework PyTorch. Pour réaliser un entrainement ou exploiter le modèle il sera nécessaire de l'installer avec la commande
+Pour installer les dépendances, exécuter la commande suivante : 
 ```shell script
-pip install torch 
+pip install -r requirements.txt
 ```
+
+##### Dépendances du projet:
+
+| Package  | Version |
+| ------------- | ------------- |
+| matplotlib  | 3.1.1  |
+| numpy  | 1.16.5  |
+| torch  | 1.0.1  |
 
 ### Générer les données
 
