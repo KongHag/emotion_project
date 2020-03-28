@@ -3,13 +3,15 @@
 from emotion import run
 import sys
 from log import setup_custom_logger
+from dataset import MediaEval18
 
 logger = setup_custom_logger("schedule_train")
+logger.setLevel(20)
 
 config = {
     'seq_len': 64,
     'num_hidden': 1,
-    'hidden_size': 512,
+    'hidden_size': 256,
     'lr': 0.0001,
     'batch_size': 64,
     'grad_clip': 1,
@@ -26,11 +28,11 @@ config = {
     'model': 'FC'
 }
 
-for num_hidden in [0, 1, 2, 3]:
-    config['num_hidden'] = num_hidden
-    for hidden_size in [32, 128, 512]:
-        config['hidden_size'] = hidden_size
-        try:
-            run(config)
-        except Exception as exception:
-            logger.critical(sys.exc_info())
+features = MediaEval18._features_len.keys()
+for feature in features:
+    print(feature)
+    config['features'] = feature
+    try:
+        run(config)
+    except Exception as exception:
+        logger.critical(sys.exc_info())
