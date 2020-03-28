@@ -27,7 +27,7 @@ configs.append({
     'fragment': 1,
     'features': 'all',
     'overlapping': True,
-    'model-with-CNN': False
+    'model': 'LSTM'
 })
 
 
@@ -50,7 +50,7 @@ configs.append({
     'fragment': 1,
     'features': 'all',
     'overlapping': True,
-    'model-with-CNN': False
+    'model': 'LSTM'
 })
 
 configs.append({
@@ -70,7 +70,7 @@ configs.append({
     'fragment': 1,
     'features': 'all',
     'overlapping': True,
-    'model-with-CNN': False
+    'model': 'LSTM'
 })
 
 configs.append({
@@ -90,7 +90,7 @@ configs.append({
     'fragment': 1,
     'features': 'all',
     'overlapping': True,
-    'model-with-CNN': False
+    'model': 'LSTM'
 })
 
 # ------------ LSTM 3 couches cachées  --------------------------
@@ -112,7 +112,7 @@ configs.append({
     'fragment': 1,
     'features': 'all',
     'overlapping': True,
-    'model-with-CNN': False
+    'model': 'LSTM'
 })
 
 configs.append({
@@ -132,7 +132,7 @@ configs.append({
     'fragment': 1,
     'features': 'all',
     'overlapping': True,
-    'model-with-CNN': False
+    'model': 'LSTM'
 })
 
 configs.append({
@@ -152,7 +152,7 @@ configs.append({
     'fragment': 1,
     'features': 'all',
     'overlapping': True,
-    'model-with-CNN': False
+    'model': 'LSTM'
 })
 
 for config in configs :

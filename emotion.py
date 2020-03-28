@@ -26,7 +26,7 @@ import argparse
 import torch
 from dataset import MediaEval18
 from torch.utils.data import DataLoader
-from model import RecurrentNet, RecurrentNetWithCNN
+from model import RecurrentNet, RecurrentNetWithCNN, FCNet
 from training import train_model
 from log import setup_custom_logger
 import logging
@@ -38,8 +38,8 @@ features = MediaEval18._features_len.keys()
 parser = argparse.ArgumentParser(
     description='Train Neural Network for emotion predictions')
 
-parser.add_argument('--add-CNN', dest='model-with-CNN', action='store_true',
-                    default=False, help='Use the model with a first layer of CNNs')
+parser.add_argument("--model", default="LSTM",
+                    choices=["FC", "LSTM", "CNN_LSTM"], help="Type of model")
 parser.add_argument("--seq-len", default=20, type=int,
                     help="Length of a sequence")
 parser.add_argument("--num-hidden", default=2, type=int,
@@ -101,38 +101,57 @@ def run(config):
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
-    ModelClass = RecurrentNetWithCNN if config['model-with-CNN'] else RecurrentNet
-    model = ModelClass(
-        input_size=next(iter(trainset))[0].shape[1],
-        hidden_size=config['hidden_size'],
-        num_layers=config['num_hidden'],
-        output_size=2,
-        dropout=config['dropout'],
-        bidirectional=config['bidirect'])
+    if config['model'] == 'FC':
+        model = FCNet(
+            input_size=next(iter(trainset))[0].shape[1],
+            output_size=2,
+            num_layers=config['num_hidden'],
+            hidden_size=config.get('hidden_size', -1),
+            dropout=config.get('dropout', 0))
+    elif config['model'] == 'LSTM':
+        model = RecurrentNet(
+            input_size=next(iter(trainset))[0].shape[1],
+            hidden_size=config.get('hidden_size', -1),
+            num_layers=config['num_hidden'],
+            output_size=2,
+            dropout=config.get('dropout', 0),
+            bidirectional=config['bidirect'])
+    elif config['model'] == 'CNN_LSTM':
+        model = RecurrentNetWithCNN(
+            input_size=next(iter(trainset))[0].shape[1],
+            hidden_size=config.get('hidden_size', -1),
+            num_layers=config['num_hidden'],
+            output_size=2,
+            dropout=config.get('dropout', 0),
+            bidirectional=config['bidirect'])
     model.to(device)
     logger.info("model : {}".format(model))
+    logger.info('number of param : {}'.format(
+        sum(p.numel() for p in model.parameters())))
+    logger.info('number of learnable param : {}'.format(
+        sum(p.numel() for p in model.parameters() if p.requires_grad)))
 
     # Define criterion
-    criterion = torch.nn.MSELoss()
+    criterion=torch.nn.MSELoss()
     logger.info("criterion : {}".format(criterion))
 
     # Define optimizer
-    attr_optimizer = config['optimizer']
-    lr = config['lr']
-    weight_decay = config['weight_decay']
+    attr_optimizer=config['optimizer']
+    lr=config['lr']
+    weight_decay=config['weight_decay']
     if attr_optimizer == 'Adam':
-        optimizer = torch.optim.Adam(
+        optimizer=torch.optim.Adam(
             model.parameters(), lr=lr, weight_decay=weight_decay)
     if attr_optimizer == 'RMSprop':
-        optimizer = torch.optim.RMSprop(
+        optimizer=torch.optim.RMSprop(
             model.parameters(), lr=lr, weight_decay=weight_decay)
     if attr_optimizer == 'SGD':
-        optimizer = torch.optim.SGD(
+        optimizer=torch.optim.SGD(
             model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.9)
     logger.info("optimizer : {}".format(optimizer))
 
     # Train model
-    train_losses, test_losses = train_model(
+    train_losses, test_losses=train_model(
         model=model, trainloader=trainloader, testloader=testloader,
         criterion=criterion, optimizer=optimizer, device=device,
         grad_clip=config['grad_clip'],
@@ -144,17 +163,17 @@ def run(config):
 
 def save_config_and_results(config, train_losses, test_losses):
     """Save in a file in results/ the config and the results"""
-    results = {
+    results={
         'train_losses': train_losses,
         'test_losses': test_losses
     }
 
-    config_and_results = {**config, **results}
+    config_and_results={**config, **results}
 
     if not os.path.exists('results'):
         os.makedirs('results')
 
-    file_name = "results/emotion_" + \
+    file_name="results/emotion_" + \
         time.strftime("%Y-%m-%d_%H-%M-%S") + ".json"
 
     # Save the config and the results
@@ -165,8 +184,8 @@ def save_config_and_results(config, train_losses, test_losses):
 
 if __name__ == '__main__':
     # Parse args
-    config = vars(parser.parse_args())
-    logger = logging.getLogger()
+    config=vars(parser.parse_args())
+    logger=logging.getLogger()
     logger.setLevel(config['logger_level'])
 
     for arg_name, arg in config.items():
@@ -174,7 +193,7 @@ if __name__ == '__main__':
             "initialization -- {} - {}".format(arg_name, arg))
 
     try:
-        train_losses, test_losses = run(config)
+        train_losses, test_losses=run(config)
         save_config_and_results(config, train_losses, test_losses)
 
     except Exception as exception:

@@ -47,7 +47,7 @@ Le modèle utilisé est une succession entre des CNN à l'échelle de chaque fea
 Pour lancer un entrainement, il faut executer le script ```emotion.py```.
 
 ```
-usage: python emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
+usage: python emotion.py [-h] [--model {FC,LSTM,CNN_LSTM}] [--seq-len SEQ_LEN]
                          [--num-hidden NUM_HIDDEN] [--hidden-size HIDDEN_SIZE]
                          [--lr LR] [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
                          [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
@@ -60,7 +60,8 @@ Train Neural Network for emotion predictions
 
 optional arguments:
   -h, --help            show this help message and exit
-  --add-CNN             Use the model with a first layer of CNNs
+  --model {FC,LSTM,CNN_LSTM}
+                        Type of model. Default LSTM.
   --seq-len SEQ_LEN     Length of a sequence
   --num-hidden NUM_HIDDEN
                         Number of hidden layers in NN
