@@ -20,7 +20,7 @@ config = {
     'bidirect': True,
     'dropout': 0.3,
     'logger_level': 20,
-    'fragment': 0.001,
+    'fragment': 1,
     'features': 'all',
     'overlapping': True,
     'model': 'FC'
