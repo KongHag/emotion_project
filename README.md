@@ -38,7 +38,7 @@ dump_data()
 ### Le modèle
 
 Le modèle utilisé est une succession entre des CNN à l'échelle de chaque feature puis un LSTM suivi de deux couches Fully Connected
-![Alt text](./architecture.svg)
+![Alt text](./docs/architecture.svg)
 
 --------------------
 
