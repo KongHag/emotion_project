@@ -28,28 +28,28 @@ logger = setup_custom_logger('Model training')
 class FCNet(nn.Module):
     """An fully connected network to predict the emotions induced by the videos."""
 
-    def __init__(self, input_size, output_size, num_layers, hidden_size=-1,
+    def __init__(self, input_size, output_size, num_hidden, hidden_size=-1,
                  dropout=0):
         """Initilialize the RNN.
 
         Arguments:
             input_size {int} -- size of the input layer
-            hidden_size {int} -- size of the hidden layer
-            num_layers {int} -- number of layers
             output_size {int} -- ouput size
+            num_hidden {int} -- number of layers
+            hidden_size {int} -- size of the hidden layer
             dropout {float} -- dropout probability, from 0 to 1
         """
         super(FCNet, self).__init__()
 
         self._raise_warning_if_necessary(
-            input_size, output_size, num_layers, hidden_size, dropout)
+            input_size, output_size, num_hidden, hidden_size, dropout)
 
-        if num_layers == 1:
+        if num_hidden == 0:
             self.main = nn.Sequential(
                 nn.Linear(input_size, output_size, bias=True),
                 nn.ReLU()
             )
-        elif num_layers == 2:
+        elif num_hidden == 1:
             self.main = nn.Sequential(
                 nn.Linear(input_size, hidden_size, bias=True),
                 nn.ReLU(),
@@ -58,7 +58,7 @@ class FCNet(nn.Module):
                 nn.ReLU()
             )
 
-        elif num_layers == 3:
+        elif num_hidden == 2:
             self.main = nn.Sequential(
                 nn.Linear(input_size, hidden_size, bias=True),
                 nn.ReLU(),
@@ -70,7 +70,7 @@ class FCNet(nn.Module):
                 nn.ReLU()
             )
 
-        elif num_layers == 4:
+        elif num_hidden == 3:
             self.main = nn.Sequential(
                 nn.Linear(input_size, hidden_size, bias=True),
                 nn.ReLU(),
@@ -78,7 +78,7 @@ class FCNet(nn.Module):
                 nn.Linear(hidden_size, hidden_size, bias=True),
                 nn.ReLU(),
                 nn.Dropout(dropout),
-                nn.Linear(hidden_size, output_size, bias=True),
+                nn.Linear(hidden_size, hidden_size, bias=True),
                 nn.ReLU(),
                 nn.Dropout(dropout),
                 nn.Linear(hidden_size, output_size, bias=True),
@@ -86,15 +86,15 @@ class FCNet(nn.Module):
             )
         else:
             raise ValueError(
-                'num layer should be between 1 and 4. Value {} is given'.format(num_layers))
+                'num_hidden should be between 0 and 3. Value {} is given'.format(num_hidden))
 
-    def _raise_warning_if_necessary(self, input_size, output_size, num_layers, hidden_size, dropout):
-        if num_layers == 1 and dropout != 0:
+    def _raise_warning_if_necessary(self, input_size, output_size, num_hidden, hidden_size, dropout):
+        if num_hidden == 0 and dropout != 0:
             logger.warning(
-                'With num_layer = 1, the dropout arg (={}) is ignored'.format(dropout))
-        if num_layers == 1 and hidden_size != -1:
+                'With num_hidden = 0, the dropout arg (={}) is ignored'.format(dropout))
+        if num_hidden == 0 and hidden_size != -1:
             logger.warning(
-                'With num_layer = 1, the hidden_size arg (={}) is ignored'.format(hidden_size))
+                'With num_hidden = 0, the hidden_size arg (={}) is ignored'.format(hidden_size))
 
     def forward(self, X):
         return self.main(X)
@@ -339,7 +339,7 @@ if __name__ == '__main__':
 
     # Defines the model
     model_FC = FCNet(
-        input_size=X.shape[-1], output_size=2, num_layers=3, dropout=0.8, hidden_size=1024)
+        input_size=X.shape[-1], output_size=2, num_hidden=0, dropout=0.8, hidden_size=1024)
 
     model_without_CNN = RecurrentNet(X.shape[-1], hidden_size=16, num_layers=8,
                                      output_size=2, dropout=0.5, bidirectional=True)

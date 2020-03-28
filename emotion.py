@@ -105,7 +105,7 @@ def run(config):
         model = FCNet(
             input_size=next(iter(trainset))[0].shape[1],
             output_size=2,
-            num_layers=config['num_hidden'],
+            num_hidden=config['num_hidden'],
             hidden_size=config.get('hidden_size', -1),
             dropout=config.get('dropout', 0))
     elif config['model'] == 'LSTM':
