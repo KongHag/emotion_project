@@ -78,6 +78,15 @@ parser.set_defaults(overlapping=True)
 
 
 def run(config):
+    # Configure logger
+    logger = logging.getLogger()
+    logger.setLevel(config['logger_level'])
+
+    # Log config
+    for arg_name, arg in config.items():
+        logger.info(
+            "initialization -- {} - {}".format(arg_name, arg))
+
     # Select device
     device = torch.device(
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
@@ -132,48 +141,48 @@ def run(config):
         sum(p.numel() for p in model.parameters() if p.requires_grad)))
 
     # Define criterion
-    criterion=torch.nn.MSELoss()
+    criterion = torch.nn.MSELoss()
     logger.info("criterion : {}".format(criterion))
 
     # Define optimizer
-    attr_optimizer=config['optimizer']
-    lr=config['lr']
-    weight_decay=config['weight_decay']
+    attr_optimizer = config['optimizer']
+    lr = config['lr']
+    weight_decay = config['weight_decay']
     if attr_optimizer == 'Adam':
-        optimizer=torch.optim.Adam(
+        optimizer = torch.optim.Adam(
             model.parameters(), lr=lr, weight_decay=weight_decay)
     if attr_optimizer == 'RMSprop':
-        optimizer=torch.optim.RMSprop(
+        optimizer = torch.optim.RMSprop(
             model.parameters(), lr=lr, weight_decay=weight_decay)
     if attr_optimizer == 'SGD':
-        optimizer=torch.optim.SGD(
+        optimizer = torch.optim.SGD(
             model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.9)
     logger.info("optimizer : {}".format(optimizer))
 
     # Train model
-    train_losses, test_losses=train_model(
+    train_losses, test_losses = train_model(
         model=model, trainloader=trainloader, testloader=testloader,
         criterion=criterion, optimizer=optimizer, device=device,
         grad_clip=config['grad_clip'],
         nb_epoch=config['nb_epoch'])
     logger.info("training done")
 
-    return train_losses, test_losses
+    save_config_and_results(config, train_losses, test_losses)
 
 
 def save_config_and_results(config, train_losses, test_losses):
     """Save in a file in results/ the config and the results"""
-    results={
+    results = {
         'train_losses': train_losses,
         'test_losses': test_losses
     }
 
-    config_and_results={**config, **results}
+    config_and_results = {**config, **results}
 
     if not os.path.exists('results'):
         os.makedirs('results')
 
-    file_name="results/emotion_" + \
+    file_name = "results/emotion_" + \
         time.strftime("%Y-%m-%d_%H-%M-%S") + ".json"
 
     # Save the config and the results
@@ -184,17 +193,10 @@ def save_config_and_results(config, train_losses, test_losses):
 
 if __name__ == '__main__':
     # Parse args
-    config=vars(parser.parse_args())
-    logger=logging.getLogger()
-    logger.setLevel(config['logger_level'])
-
-    for arg_name, arg in config.items():
-        logger.info(
-            "initialization -- {} - {}".format(arg_name, arg))
+    config = vars(parser.parse_args())
 
     try:
-        train_losses, test_losses=run(config)
-        save_config_and_results(config, train_losses, test_losses)
+        run(config)
 
     except Exception as exception:
         logger.critical(sys.exc_info())
