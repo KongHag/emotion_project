@@ -29,6 +29,7 @@ from torch.utils.data import DataLoader
 from model import RecurrentNet, RecurrentNetWithCNN, FCNet
 from training import train_model
 from log import setup_custom_logger
+from metrics import get_metrics
 import logging
 import json
 
@@ -167,12 +168,18 @@ def run(config):
         nb_epoch=config['nb_epoch'])
     logger.info("training done")
 
-    save_config_and_results(config, train_losses, test_losses)
+    metrics = get_metrics(model, testloader)
+
+    save_config_and_results(config, train_losses, test_losses, metrics)
 
 
-def save_config_and_results(config, train_losses, test_losses):
+def save_config_and_results(config, train_losses, test_losses, metrics):
     """Save in a file in results/ the config and the results"""
     results = {
+        'MSE_valence': metrics["MSE_valence"],
+        'MSE_arousal': metrics["MSE_arousal"],
+        'r_valence': metrics["r_valence"],
+        'r_arousal': metrics["r_arousal"],
         'train_losses': train_losses,
         'test_losses': test_losses
     }

@@ -6,8 +6,6 @@ Created on Sun Mar 29 15:32:25 2020
 """
 import torch
 from scipy.stats import pearsonr
-from dataset import MediaEval18
-from torch.utils.data import DataLoader
 
 def get_metrics(model, testloader):
     
@@ -54,7 +52,13 @@ def get_metrics(model, testloader):
     r_valence = pearsonr(predictions_valence, label_valence)
     r_arousal = pearsonr(predictions_arousal, label_arousal)
     
-    return MSE_valence, MSE_arousal, r_valence, r_arousal
+    results = {
+        "MSE_valence" : MSE_valence,
+        "MSE_arousal" : MSE_arousal,
+        "r_valence" : r_valence,
+        "r_arousal" : r_arousal
+    }
+    return results
 
 
     
