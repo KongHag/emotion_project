@@ -39,7 +39,7 @@ def get_metrics(model, testloader):
         gpu_output = model(*model_args)
         
         inputs = torch.cat((inputs, X), 1)
-        outputs = torch.cat((outputs, gpu_output), 1)
+        outputs = torch.cat((outputs, gpu_output.to(device=torch.device('cpu'))), 1)
         labels = torch.cat((labels, Y), 1)
     
     predictions_valence, predictions_arousal = outputs[0][:], outputs[1][:]
