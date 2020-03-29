@@ -28,6 +28,11 @@ config = {
     'model': 'FC'
 }
 
+try:
+    run(config)
+except Exception as exception:
+    logger.critical(sys.exc_info())
+"""
 features = MediaEval18._features_len.keys()
 for feature in features:
     print(feature)
@@ -36,3 +41,4 @@ for feature in features:
         run(config)
     except Exception as exception:
         logger.critical(sys.exc_info())
+"""
