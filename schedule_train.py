@@ -11,7 +11,7 @@ logger.setLevel(20)
 config = {
     'seq_len': 64,
     'num_hidden': 1,
-    'hidden_size': 4,
+    'hidden_size': 2,
     'lr': 0.0001,
     'batch_size': 64,
     'grad_clip': 1,
