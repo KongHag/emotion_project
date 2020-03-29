@@ -38,9 +38,9 @@ def get_metrics(model, testloader):
         # Output and loss computation
         gpu_output = model(*model_args)
         
-        flattenX = torch.flatten(X, end_dim=1)
-        flattenY = torch.flatten(Y, end_dim=1)
-        flattenOutput = torch.flatten(gpu_output.to(device=torch.device('cpu')), end_dim=1)
+        flattenX = torch.flatten(X, end_dim=1).detach()
+        flattenY = torch.flatten(Y, end_dim=1).detach()
+        flattenOutput = torch.flatten(gpu_output.to(device=torch.device('cpu')), end_dim=1).detach()
         inputs = torch.cat((inputs, flattenX), 0)
         outputs = torch.cat((outputs, flattenOutput), 0)
         labels = torch.cat((labels, flattenY), 0)
