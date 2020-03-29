@@ -246,6 +246,8 @@ class RecurrentNetWithCNN(nn.Module):
         self.fc_layer1 = nn.Linear(
             in_features=self.hidden_size*self.coef, out_features=self.hidden_size, bias=True)
 
+        self.dropout2 = nn.Dropout(dropout)
+
         self.fc_layer2 = nn.Linear(
             in_features=self.hidden_size, out_features=output_size, bias=True)
 
@@ -312,6 +314,7 @@ class RecurrentNetWithCNN(nn.Module):
         X = F.relu(X)
         X = self.dropout1(X)
         X = F.relu(self.fc_layer1(X))
+        X = self.dropout2(X)
         X = F.relu(self.fc_layer2(X))
         return X
 
