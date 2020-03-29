@@ -38,9 +38,9 @@ def get_metrics(model, testloader):
         # Output and loss computation
         gpu_output = model(*model_args)
         
-        inputs = torch.cat((inputs, X), 1)
-        outputs = torch.cat((outputs, gpu_output.to(device=torch.device('cpu'))), 1)
-        labels = torch.cat((labels, Y), 1)
+        inputs = torch.cat((inputs, X), 2)
+        outputs = torch.cat((outputs, gpu_output.to(device=torch.device('cpu'))), 2)
+        labels = torch.cat((labels, Y), 2)
     
     predictions_valence, predictions_arousal = outputs[0][:], outputs[1][:]
     label_valence, label_arousal = labels[0][:], labels[1][:]

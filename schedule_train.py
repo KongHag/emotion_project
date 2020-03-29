@@ -24,7 +24,7 @@ config = {
     'logger_level': 20,
     'fragment': 1,
     'features': 'cl',
-    'overlapping': True,
+    'overlapping': False,
     'model': 'FC'
 }
 
