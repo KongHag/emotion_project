@@ -59,7 +59,7 @@ def get_metrics(model):
     r_valence = pearsonr(predictions_valence, label_valence)
     r_arousal = pearsonr(predictions_arousal, label_arousal)
     
-    return MSE_arousal, MSE_valence, r_arousal, r_valence
+    return MSE_valence, MSE_arousal, r_valence, r_arousal
 
 
     
