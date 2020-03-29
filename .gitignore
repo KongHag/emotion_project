@@ -1,6 +1,7 @@
 # training results
 
 results/*.out
+results/emotion_2020-03-26_19:11:34.json
 
 # our data
 data/*.pickle
