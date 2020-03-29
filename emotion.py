@@ -26,7 +26,7 @@ import argparse
 import torch
 from dataset import MediaEval18
 from torch.utils.data import DataLoader
-from model import RecurrentNet, RecurrentNetWithCNN
+from model import RecurrentNet, RecurrentNetWithCNN, FCNet
 from training import train_model
 from log import setup_custom_logger
 import logging
@@ -38,8 +38,8 @@ features = MediaEval18._features_len.keys()
 parser = argparse.ArgumentParser(
     description='Train Neural Network for emotion predictions')
 
-parser.add_argument('--add-CNN', dest='model-with-CNN', action='store_true',
-                    default=False, help='Use the model with a first layer of CNNs')
+parser.add_argument("--model", default="LSTM",
+                    choices=["FC", "LSTM", "CNN_LSTM"], help="Type of model")
 parser.add_argument("--seq-len", default=20, type=int,
                     help="Length of a sequence")
 parser.add_argument("--num-hidden", default=2, type=int,
@@ -78,6 +78,15 @@ parser.set_defaults(overlapping=True)
 
 
 def run(config):
+    # Configure logger
+    logger = logging.getLogger()
+    logger.setLevel(config['logger_level'])
+
+    # Log config
+    for arg_name, arg in config.items():
+        logger.info(
+            "initialization -- {} - {}".format(arg_name, arg))
+
     # Select device
     device = torch.device(
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
@@ -101,16 +110,35 @@ def run(config):
         "testset/loader initialized : testset lenght : {}".format(len(testset)))
 
     # Model initilisation
-    ModelClass = RecurrentNetWithCNN if config['model-with-CNN'] else RecurrentNet
-    model = ModelClass(
-        input_size=next(iter(trainset))[0].shape[1],
-        hidden_size=config['hidden_size'],
-        num_layers=config['num_hidden'],
-        output_size=2,
-        dropout=config['dropout'],
-        bidirectional=config['bidirect'])
+    if config['model'] == 'FC':
+        model = FCNet(
+            input_size=next(iter(trainset))[0].shape[1],
+            output_size=2,
+            num_hidden=config['num_hidden'],
+            hidden_size=config.get('hidden_size', -1),
+            dropout=config.get('dropout', 0))
+    elif config['model'] == 'LSTM':
+        model = RecurrentNet(
+            input_size=next(iter(trainset))[0].shape[1],
+            hidden_size=config.get('hidden_size', -1),
+            num_layers=config['num_hidden'],
+            output_size=2,
+            dropout=config.get('dropout', 0),
+            bidirectional=config['bidirect'])
+    elif config['model'] == 'CNN_LSTM':
+        model = RecurrentNetWithCNN(
+            input_size=next(iter(trainset))[0].shape[1],
+            hidden_size=config.get('hidden_size', -1),
+            num_layers=config['num_hidden'],
+            output_size=2,
+            dropout=config.get('dropout', 0),
+            bidirectional=config['bidirect'])
     model.to(device)
     logger.info("model : {}".format(model))
+    logger.info('number of param : {}'.format(
+        sum(p.numel() for p in model.parameters())))
+    logger.info('number of learnable param : {}'.format(
+        sum(p.numel() for p in model.parameters() if p.requires_grad)))
 
     # Define criterion
     criterion = torch.nn.MSELoss()
@@ -139,7 +167,7 @@ def run(config):
         nb_epoch=config['nb_epoch'])
     logger.info("training done")
 
-    return train_losses, test_losses
+    save_config_and_results(config, train_losses, test_losses)
 
 
 def save_config_and_results(config, train_losses, test_losses):
@@ -166,16 +194,9 @@ def save_config_and_results(config, train_losses, test_losses):
 if __name__ == '__main__':
     # Parse args
     config = vars(parser.parse_args())
-    logger = logging.getLogger()
-    logger.setLevel(config['logger_level'])
-
-    for arg_name, arg in config.items():
-        logger.info(
-            "initialization -- {} - {}".format(arg_name, arg))
 
     try:
-        train_losses, test_losses = run(config)
-        save_config_and_results(config, train_losses, test_losses)
+        run(config)
 
     except Exception as exception:
         logger.critical(sys.exc_info())

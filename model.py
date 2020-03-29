@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Defines two recurrent networks.
-The network used is a LSTM network
+Defines three networks.
 
+FCNet               : Input >> FC layer >> Output
 RecurrentNet        : Input >> LSTM layer >> FC layer >> Output
 RecurrentNetWithCNN : Input >> CNN >> LSTM layer >> FC layer >> Output
 
 To setup recurrent net :
 >>> from model import RecurrentNet, RecurrentNetWithCNN
+>>> model = FCNet(input_size, output_size, num_layers, hidden_size, dropout)
 >>> model = RecurrentNet(input_size, hidden_size, num_layers,
         output_size, dropout, bidirectional)
 or 
@@ -19,6 +20,84 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
+from log import setup_custom_logger
+
+logger = setup_custom_logger('Model training')
+
+
+class FCNet(nn.Module):
+    """An fully connected network to predict the emotions induced by the videos."""
+
+    def __init__(self, input_size, output_size, num_hidden, hidden_size=-1,
+                 dropout=0):
+        """Initilialize the RNN.
+
+        Arguments:
+            input_size {int} -- size of the input layer
+            output_size {int} -- ouput size
+            num_hidden {int} -- number of layers
+            hidden_size {int} -- size of the hidden layer
+            dropout {float} -- dropout probability, from 0 to 1
+        """
+        super(FCNet, self).__init__()
+
+        self._raise_warning_if_necessary(
+            input_size, output_size, num_hidden, hidden_size, dropout)
+
+        if num_hidden == 0:
+            self.main = nn.Sequential(
+                nn.Linear(input_size, output_size, bias=True),
+                nn.ReLU()
+            )
+        elif num_hidden == 1:
+            self.main = nn.Sequential(
+                nn.Linear(input_size, hidden_size, bias=True),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_size, output_size, bias=True),
+                nn.ReLU()
+            )
+
+        elif num_hidden == 2:
+            self.main = nn.Sequential(
+                nn.Linear(input_size, hidden_size, bias=True),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_size, hidden_size, bias=True),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_size, output_size, bias=True),
+                nn.ReLU()
+            )
+
+        elif num_hidden == 3:
+            self.main = nn.Sequential(
+                nn.Linear(input_size, hidden_size, bias=True),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_size, hidden_size, bias=True),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_size, hidden_size, bias=True),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_size, output_size, bias=True),
+                nn.ReLU()
+            )
+        else:
+            raise ValueError(
+                'num_hidden should be between 0 and 3. Value {} is given'.format(num_hidden))
+
+    def _raise_warning_if_necessary(self, input_size, output_size, num_hidden, hidden_size, dropout):
+        if num_hidden == 0 and dropout != 0:
+            logger.warning(
+                'With num_hidden = 0, the dropout arg (={}) is ignored'.format(dropout))
+        if num_hidden == 0 and hidden_size != -1:
+            logger.warning(
+                'With num_hidden = 0, the hidden_size arg (={}) is ignored'.format(hidden_size))
+
+    def forward(self, X):
+        return self.main(X)
 
 
 class RecurrentNet(nn.Module):
@@ -259,11 +338,17 @@ if __name__ == '__main__':
     X, Y = next(iter(my_loader))
 
     # Defines the model
+    model_FC = FCNet(
+        input_size=X.shape[-1], output_size=2, num_hidden=0, dropout=0.8, hidden_size=1024)
+
     model_without_CNN = RecurrentNet(X.shape[-1], hidden_size=16, num_layers=8,
                                      output_size=2, dropout=0.5, bidirectional=True)
 
     model_with_CNN = RecurrentNetWithCNN(None, hidden_size=16, num_layers=8,
                                          output_size=2, dropout=0.5, bidirectional=True)
+
+    output = model_FC(X)
+    print("output computed with model FC. shape :", output.shape)
 
     hidden_and_cell = model_without_CNN.initHelper(batch_size=32)
     output = model_without_CNN(X, hidden_and_cell)

@@ -38,7 +38,7 @@ dump_data()
 ### Le modèle
 
 Le modèle utilisé est une succession entre des CNN à l'échelle de chaque feature puis un LSTM suivi de deux couches Fully Connected
-![Alt text](./architecture.svg)
+![Alt text](./docs/architecture.svg)
 
 --------------------
 
@@ -47,7 +47,7 @@ Le modèle utilisé est une succession entre des CNN à l'échelle de chaque fea
 Pour lancer un entrainement, il faut executer le script ```emotion.py```.
 
 ```
-usage: python emotion.py [-h] [--add-CNN] [--seq-len SEQ_LEN]
+usage: python emotion.py [-h] [--model {FC,LSTM,CNN_LSTM}] [--seq-len SEQ_LEN]
                          [--num-hidden NUM_HIDDEN] [--hidden-size HIDDEN_SIZE]
                          [--lr LR] [--batch-size BATCH_SIZE] [--grad-clip GRAD_CLIP]
                          [--nb-epoch NB_EPOCH] [-O {Adam,RMSprop,SGD}] [-B BIDIRECT]
@@ -60,7 +60,8 @@ Train Neural Network for emotion predictions
 
 optional arguments:
   -h, --help            show this help message and exit
-  --add-CNN             Use the model with a first layer of CNNs
+  --model {FC,LSTM,CNN_LSTM}
+                        Type of model. Default LSTM.
   --seq-len SEQ_LEN     Length of a sequence
   --num-hidden NUM_HIDDEN
                         Number of hidden layers in NN
@@ -104,7 +105,9 @@ Usage :
 python show.py
 ```
 
-![Alt text](./results/graphs/emotion_2020-03-20_20_30_51.png)
+Le fichier `results/graphs/emotion_YYYY-mm-dd_HH-MM-SS.png` est généré avec en bleu la `train loss` et en orange la `test loss`
+
+![Alt text](./results/graphs/emotion_2020-03-26_22-24-17.png)
 
 --------------------
 
@@ -115,7 +118,7 @@ Ce projet a été réalisé en colaboration avec
 * Augustin ARDON
 * William BLAUFUKS
 * Lucas DORMOY
-* Quentin GALLOUEDEC
+* Quentin GALLOUÉDEC
 * Timothée HAGUENAUER
 
 Dans le cadre d'un projet de l'Ecole Centrale de Lyon commandité par Emmanuel DELLANDREA
