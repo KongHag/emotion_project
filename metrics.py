@@ -9,12 +9,7 @@ from scipy.stats import pearsonr
 from dataset import MediaEval18
 from torch.utils.data import DataLoader
 
-def get_metrics(model):
-    
-    testset = MediaEval18(root='./data', train=False, fragment=0.3,
-                          shuffle=True, features=["all"])
-    testloader = DataLoader(
-        testset, batch_size=64, shuffle=True)
+def get_metrics(model, testloader):
     
     device = torch.device(
         'cuda:0') if torch.cuda.is_available() else torch.device('cpu')
