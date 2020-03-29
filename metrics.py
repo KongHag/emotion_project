@@ -49,8 +49,8 @@ def get_metrics(model, testloader):
     label_valence, label_arousal = labels[0][:], labels[1][:]
     
     MSE = torch.nn.MSELoss()
-    MSE_valence = MSE(predictions_valence, label_valence)
-    MSE_arousal = MSE(predictions_arousal, label_arousal)
+    MSE_valence = float(MSE(predictions_valence, label_valence))
+    MSE_arousal = float(MSE(predictions_arousal, label_arousal))
     
     r_valence = pearsonr(predictions_valence, label_valence)[0]
     r_arousal = pearsonr(predictions_arousal, label_arousal)[0]
