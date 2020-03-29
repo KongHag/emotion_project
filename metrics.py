@@ -52,8 +52,8 @@ def get_metrics(model, testloader):
     MSE_valence = str(float(MSE(predictions_valence, label_valence)))
     MSE_arousal = str(float(MSE(predictions_arousal, label_arousal)))
     
-    r_valence = pearsonr(predictions_valence, label_valence)[0]
-    r_arousal = pearsonr(predictions_arousal, label_arousal)[0]
+    r_valence = str(pearsonr(predictions_valence, label_valence)[0])
+    r_arousal = str(pearsonr(predictions_arousal, label_arousal)[0])
     
     results = {
         "MSE_valence" : MSE_valence,
