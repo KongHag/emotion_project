@@ -46,8 +46,8 @@ def get_metrics(model, testloader):
         labels = torch.cat((labels, flattenY), 0)
         print(labels.shape)
     
-    predictions_valence, predictions_arousal = outputs[:][0], outputs[:][1]
-    label_valence, label_arousal = labels[:][0], labels[:][1]
+    predictions_valence, predictions_arousal = outputs[:,0], outputs[:,1]
+    label_valence, label_arousal = labels[:,0], labels[:,1]
 
     print(predictions_arousal.shape, label_valence.shape)
     
