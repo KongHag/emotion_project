@@ -23,7 +23,7 @@ config = {
     'dropout': 0.3,
     'logger_level': 20,
     'fragment': 1,
-    'features': 'all',
+    'features': 'cl',
     'overlapping': True,
     'model': 'FC'
 }
